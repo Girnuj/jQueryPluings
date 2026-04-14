@@ -4,7 +4,7 @@
  * @since 2026
  * @module VideoUrlPreview
  */
-(function ($) {
++function ($) {
 	'use strict';
 
 	const PLUGIN_NAME = 'videoUrlPreview'
@@ -182,4 +182,4 @@
 	});
 	observer.observe(document.body, { childList: true, subtree: true });
 
-})(window.jQuery);
+}(window.jQuery);
