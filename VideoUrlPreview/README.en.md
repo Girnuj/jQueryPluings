@@ -62,8 +62,8 @@ If you need to initialize a specific block manually:
 
 ```html
 <script>
-  const input = document.querySelector('#myInput');
-  const instance = VideoUrlPreview.init(input);
+  const input = document.querySelector('#myInput')
+      , instance = VideoUrlPreview.init(input);
 
   VideoUrlPreview.getInstance(input);
   VideoUrlPreview.destroy(input, { clearPreview: true });

@@ -11,6 +11,14 @@ These are automatically initialized when they detect the necessary HTML attribut
 Functional plugins in native JavaScript.
 ECMAScript 2020 is supported by most modern browsers.
 
+## Available Plugins
+
+- `ImgUploadPreview`: previews selected image files in an `<img>` element.
+- `VideoUrlPreview`: previews YouTube videos in an `<iframe>` from a URL.
+- `ItemMover`: moves list elements up or down using `data-*` trigger attributes.
+- `ItemRemover`: removes container elements from a delete trigger.
+- `ReplaceMe`: replaces a trigger with remote HTML fetched through `POST`.
+
 ## Repository Structure
 
 Each plugin lives in its own folder and should include its documentation:
@@ -20,7 +28,7 @@ PluginsPublicos/
   PluginName/
     plugin.js
     README.md
-    test-pluginName-preview.html
+    test-pluginName.html
 ```
 
 Current example:

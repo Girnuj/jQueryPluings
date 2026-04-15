@@ -62,8 +62,8 @@ Si necesitas inicializar manualmente un bloque concreto:
 
 ```html
 <script>
-  const input = document.querySelector('#miInput');
-  const instance = VideoUrlPreview.init(input);
+  const input = document.querySelector('#miInput')
+      , instance = VideoUrlPreview.init(input);
 
   VideoUrlPreview.getInstance(input);
   VideoUrlPreview.destroy(input, { clearPreview: true });

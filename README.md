@@ -11,6 +11,14 @@ Estos se inicializan solos al detectar los atributos HTML necesarios, asi no tie
 Plugins funcionales en JavaScript nativo.
 ECMAScript 2020 esta soportado por la mayoria de navegadores modernos.
 
+## Plugins Disponibles
+
+- `ImgUploadPreview`: previsualiza imagenes seleccionadas desde un input file en un elemento `<img>`.
+- `VideoUrlPreview`: previsualiza videos de YouTube en un `<iframe>` a partir de una URL.
+- `ItemMover`: mueve elementos de una lista hacia arriba o hacia abajo usando triggers con atributos `data-*`.
+- `ItemRemover`: elimina elementos contenedores desde un trigger de borrado.
+- `ReplaceMe`: reemplaza un trigger por HTML remoto obtenido mediante `POST`.
+
 ## Estructura del Repositorio
 
 Cada plugin vive en su propia carpeta y debe incluir su documentacion:
@@ -20,7 +28,7 @@ PluginsPublicos/
   NombreDelPlugin/
     plugin.js
     README.md
-    test-pluginName-preview.html
+    test-pluginName.html
 ```
 
 Ejemplo actual:

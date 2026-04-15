@@ -88,8 +88,8 @@ Si necesitas inicializar manualmente un bloque concreto:
 
 ```html
 <script>
-  const input = document.querySelector('#miInput');
-  const instance = ImgUploadPreview.init(input);
+  const input = document.querySelector('#miInput')
+      , instance = ImgUploadPreview.init(input);
 
   ImgUploadPreview.getInstance(input);
   ImgUploadPreview.destroy(input, { clearPreview: true });

@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Test - ReplaceMe</title>
+  <style>
+    body {
+      font-family: Segoe UI, Tahoma, sans-serif;
+      margin: 24px;
+      line-height: 1.4;
+      color: #222;
+    }
+
+    .stack {
+      display: grid;
+      gap: 12px;
+      max-width: 760px;
+      margin-bottom: 20px;
+    }
+
+    .panel {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 12px;
+      background: #fafafa;
+    }
+
+    button {
+      padding: 8px 12px;
+      border: 1px solid #aaa;
+      border-radius: 6px;
+      background: #f2f2f2;
+      cursor: pointer;
+    }
+
+    .note {
+      color: #444;
+      font-size: 14px;
+    }
+
+    .remote-box {
+      border-left: 4px solid #4a90e2;
+      background: #eef6ff;
+      padding: 10px;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Prueba de plugin <code>ReplaceMe</code></h1>
+  <p class="note">Este demo simula un endpoint remoto para probar el reemplazo sin backend.</p>
+
+  <section class="stack">
+    <div class="panel">
+      <h2>Ejemplo con POST</h2>
+      <button
+        type="button"
+        data-role="replace-me"
+        data-replace-me-src="/demo/replace-html"
+        data-replace-me-method="POST">
+        Reemplazar con POST
+      </button>
+    </div>
+
+    <div class="panel">
+      <h2>Ejemplo con GET</h2>
+      <button
+        type="button"
+        data-role="replace-me"
+        data-replace-me-src="/demo/replace-html"
+        data-replace-me-method="GET">
+        Reemplazar con GET
+      </button>
+    </div>
+
+    <button id="addDynamic" type="button">Agregar trigger dinamico</button>
+    <div id="dynamicHost" class="panel"></div>
+  </section>
+ 
+  <script src="./replaceMe.js"></script>
+  <script>
+    // Simulador de endpoint para que el ejemplo funcione sin servidor.
+    (function () {
+      const originalFetch = window.fetch.bind(window);
+
+      window.fetch = async function (input, init) {
+        const url = typeof input === 'string' ? input : input.url;
+
+        const requestMethod = (init && init.method ? init.method : 'GET').toUpperCase();
+
+        if (url === '/demo/replace-html' && (requestMethod === 'POST' || requestMethod === 'GET')) {
+          const html =
+            '<div class="remote-box">' +
+              '<strong>Contenido remoto cargado</strong>' +
+              '<p>Este HTML fue devuelto por un fetch simulado usando <b>' + requestMethod + '</b>.</p>' +
+            '</div>';
+
+          return new Response(html, {
+            status: 200,
+            headers: { 'Content-Type': 'text/html; charset=utf-8' },
+          });
+        }
+
+        return originalFetch(input, init);
+      };
+    })();
+  </script>
+
+  <script>
+    document.getElementById('addDynamic').addEventListener('click', function () {
+      const host = document.getElementById('dynamicHost');
+      host.insertAdjacentHTML(
+        'beforeend',
+        '<button type="button" data-role="replace-me" data-replace-me-src="/demo/replace-html" data-replace-me-method="POST">' +
+          'Reemplazar trigger dinamico (POST)' +
+        '</button>'
+      );
+    });
+  </script>
+</body>
+</html>

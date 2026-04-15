@@ -66,8 +66,8 @@ Ademas, usa `MutationObserver` para inicializar triggers agregados dinamicamente
 
 ```html
 <script>
-  const trigger = document.querySelector('#btnEliminar');
-  const instance = ItemRemover.init(trigger);
+  const trigger = document.querySelector('#btnEliminar')
+      , instance = ItemRemover.init(trigger);
 
   ItemRemover.getInstance(trigger);
   ItemRemover.destroy(trigger);

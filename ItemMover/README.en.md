@@ -79,8 +79,8 @@ It also uses `MutationObserver` to initialize triggers added dynamically to the 
 
 ```html
 <script>
-  const trigger = document.querySelector('#moveBtn');
-  const instance = ItemMover.init(trigger);
+  const trigger = document.querySelector('#moveBtn')
+      , instance = ItemMover.init(trigger);
 
   ItemMover.getInstance(trigger);
   ItemMover.destroy(trigger);
