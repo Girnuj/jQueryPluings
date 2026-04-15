@@ -2,6 +2,7 @@
  * @fileoverview Plugin nativo para previsualizar imagenes al subir archivos.
  * @version 3.0
  * @since 2026
+ * @author Samuel Montenegro
  * @module ImgUploadPreview
  */
 (function () {
@@ -63,7 +64,6 @@
 			if (!node.isConnected) {
 				ImgUploadPreview.destroyAll(node);
 			}
-
 			PENDING_REMOVALS.delete(node);
 		});
 	};
@@ -95,10 +95,7 @@
 		 * Vincula el evento de cambio al input para mostrar la previsualización.
 		 */
 		bind() {
-			if (this.isBound) {
-				return;
-			}
-
+			if (this.isBound) return;
 			this.subject.addEventListener('change', this.handleChange);
 			this.isBound = true;
 		}
@@ -109,10 +106,7 @@
 		 * @param {boolean} [options.clearPreview=false] - Indica si debe limpiar la imagen actual.
 		 */
 		destroy(options = {}) {
-			if (!this.isBound) {
-				return;
-			}
-
+			if (!this.isBound) return;
 			const { clearPreview = false } = options;
 
 			this.subject.removeEventListener('change', this.handleChange);
@@ -162,9 +156,7 @@
 				return;
 			}
 
-			if (!this.target) {
-				return;
-			}
+			if (!this.target) return;
 
 			const reader = new FileReader();
 			reader.onload = (e) => {
@@ -172,39 +164,30 @@
 			};
 			reader.readAsDataURL(file);
 		}
+
 		static init(element, options = {}) {
 			if (!(element instanceof HTMLInputElement)) {
 				throw new Error('Error: ImgUploadPreview.init requiere un <input>.');
 			}
 
 			const currentInstance = INSTANCES.get(element);
-			if (currentInstance) {
-				return currentInstance;
-			}
+			if (currentInstance) return currentInstance;
 
 			const validatedOptions = getValidatedOptions(element, options)
 				, instance = new ImgUploadPreview(element, validatedOptions);
-
 			INSTANCES.set(element, instance);
 			instance.bind();
 			return instance;
 		}
 
 		static getInstance(element) {
-			if (!(element instanceof HTMLInputElement)) {
-				return null;
-			}
-
+			if (!(element instanceof HTMLInputElement)) return null;
 			return INSTANCES.get(element) || null;
 		}
 
 		static destroy(element, options = {}) {
 			const instance = ImgUploadPreview.getInstance(element);
-
-			if (!instance) {
-				return false;
-			}
-
+			if (!instance) return false;
 			instance.destroy(options);
 			return true;
 		}
@@ -241,11 +224,9 @@
 		observer.observe(document.body, { childList: true, subtree: true });
 	};
 
-	if (document.readyState === 'loading') {
-		document.addEventListener('DOMContentLoaded', startAutoInit, { once: true });
-	} else {
-		startAutoInit();
-	}
-
+	document.readyState === 'loading' 
+		? document.addEventListener('DOMContentLoaded', startAutoInit, { once: true })
+	 	: startAutoInit();
+	
 	window.ImgUploadPreview = ImgUploadPreview;
 })();

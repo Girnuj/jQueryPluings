@@ -2,6 +2,7 @@
  * @fileoverview Plugin nativo para previsualizar videos de YouTube a partir de una URL ingresada.
  * @version 3.0
  * @since 2026
+ * @author Samuel Montenegro
  * @module VideoUrlPreview
  */
 (function () {
@@ -61,7 +62,6 @@
 			if (!node.isConnected) {
 				VideoUrlPreview.destroyAll(node);
 			}
-
 			PENDING_REMOVALS.delete(node);
 		});
 	};
@@ -107,10 +107,7 @@
 		 * Vincula los eventos del input.
 		 */
 		bind() {
-			if (this.isBound) {
-				return;
-			}
-
+			if (this.isBound) return;
 			this.subject.addEventListener('input', this.handleInput);
 			this.subject.addEventListener('change', this.handleChange);
 			this.isBound = true;
@@ -123,10 +120,7 @@
 		 * @param {boolean} [options.clearPreview=false] - Indica si debe limpiar el iframe actual.
 		 */
 		destroy(options = {}) {
-			if (!this.isBound) {
-				return;
-			}
-
+			if (!this.isBound) return;
 			const { clearPreview = false } = options;
 
 			this.subject.removeEventListener('input', this.handleInput);
@@ -155,9 +149,7 @@
 			const value = `${inputValue || ''}`.trim()
 				, videoId = this.getYouTubeId(value);
 
-			if (!this.target) {
-				return;
-			}
+			if (!this.target) return;
 
 			if (videoId) {
 				this.target.src = `//www.youtube.com/embed/${videoId}`;
@@ -191,9 +183,7 @@
 			}
 
 			const currentInstance = INSTANCES.get(element);
-			if (currentInstance) {
-				return currentInstance;
-			}
+			if (currentInstance) return currentInstance;	
 
 			const validatedOptions = getValidatedOptions(element, options)
 				, instance = new VideoUrlPreview(element, validatedOptions);
@@ -204,20 +194,13 @@
 		}
 
 		static getInstance(element) {
-			if (!(element instanceof HTMLInputElement)) {
-				return null;
-			}
-
+			if (!(element instanceof HTMLInputElement)) return null;	
 			return INSTANCES.get(element) || null;
 		}
 
 		static destroy(element, options = {}) {
 			const instance = VideoUrlPreview.getInstance(element);
-
-			if (!instance) {
-				return false;
-			}
-
+			if (!instance) return false;	
 			instance.destroy(options);
 			return true;
 		}
@@ -254,11 +237,9 @@
 		observer.observe(document.body, { childList: true, subtree: true });
 	};
 
-	if (document.readyState === 'loading') {
-		document.addEventListener('DOMContentLoaded', startAutoInit, { once: true });
-	} else {
-		startAutoInit();
-	}
+	document.readyState === 'loading'
+		? document.addEventListener('DOMContentLoaded', startAutoInit, { once: true })
+		: startAutoInit();
 
 	window.VideoUrlPreview = VideoUrlPreview;
 })();

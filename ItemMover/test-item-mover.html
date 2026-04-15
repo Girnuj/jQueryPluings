@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Test - ItemMover</title>
+  <style>
+    body {
+      font-family: Segoe UI, Tahoma, sans-serif;
+      margin: 24px;
+      line-height: 1.4;
+      color: #222;
+    }
+
+    .stack {
+      display: grid;
+      gap: 12px;
+      max-width: 760px;
+      margin-bottom: 20px;
+    }
+
+    .list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      gap: 8px;
+    }
+
+    .item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 10px 12px;
+      background: #fafafa;
+    }
+
+    .actions {
+      display: inline-flex;
+      gap: 8px;
+    }
+
+    button {
+      padding: 6px 10px;
+      border: 1px solid #aaa;
+      border-radius: 6px;
+      background: #f2f2f2;
+      cursor: pointer;
+    }
+
+    .note {
+      color: #444;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Prueba de plugin <code>ItemMover</code></h1>
+  <p class="note">Usa Subir/Bajar para reordenar elementos. El bloque dinamico valida auto-init sin llamadas manuales.</p>
+
+  <section class="stack">
+    <h2>Lista principal</h2>
+    <ul id="todoList" class="list">
+      <li class="item mover-item">
+        <span>Item 1</span>
+        <span class="actions">
+          <button type="button" data-role="move-item" data-move-target=".mover-item" data-move-direction="previous">Subir</button>
+          <button type="button" data-role="move-item" data-move-target=".mover-item" data-move-direction="next">Bajar</button>
+        </span>
+      </li>
+      <li class="item mover-item">
+        <span>Item 2</span>
+        <span class="actions">
+          <button type="button" data-role="move-item" data-move-target=".mover-item" data-move-direction="previous">Subir</button>
+          <button type="button" data-role="move-item" data-move-target=".mover-item" data-move-direction="next">Bajar</button>
+        </span>
+      </li>
+      <li class="item mover-item">
+        <span>Item 3</span>
+        <span class="actions">
+          <button type="button" data-role="move-item" data-move-target=".mover-item" data-move-direction="previous">Subir</button>
+          <button type="button" data-role="move-item" data-move-target=".mover-item" data-move-direction="next">Bajar</button>
+        </span>
+      </li>
+    </ul>
+  </section>
+
+  <button id="addDynamic" type="button">Agregar item dinamico</button>
+
+  <script src="./itemMover.js"></script>
+  <script>
+     // Bloque opcional para probar que el MutationObserver inicializa nuevos items.
+    let dynamicCounter = 4;
+    document.getElementById('addDynamic').addEventListener('click', function () {
+      const list = document.getElementById('todoList');
+      list.insertAdjacentHTML(
+        'beforeend',
+        '<li class="item mover-item">' +
+          '<span>Item ' + dynamicCounter + '</span>' +
+          '<span class="actions">' +
+            '<button type="button" data-role="move-item" data-move-target=".mover-item" data-move-direction="previous">Subir</button>' +
+            '<button type="button" data-role="move-item" data-move-target=".mover-item" data-move-direction="next">Bajar</button>' +
+          '</span>' +
+        '</li>'
+      );
+      dynamicCounter += 1;
+    });
+  </script>
+</body>
+</html>
