@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Test - InputSwitchFriendly</title>
+  <style>
+    body {
+      font-family: Segoe UI, Tahoma, sans-serif;
+      margin: 24px;
+      line-height: 1.4;
+      color: #222;
+      background: #f6f8fa;
+    }
+
+    .stack {
+      max-width: 760px;
+      display: grid;
+      gap: 16px;
+    }
+
+    .box {
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      padding: 12px;
+      background: #fff;
+      display: grid;
+      gap: 10px;
+    }
+
+    .row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .state {
+      font-weight: 600;
+      color: #0a4;
+      min-width: 120px;
+    }
+
+    .note {
+      font-size: 14px;
+      color: #555;
+      margin: 0;
+    }
+
+    button {
+      padding: 8px 12px;
+      border: 1px solid #aaa;
+      border-radius: 6px;
+      background: #f2f2f2;
+      cursor: pointer;
+      width: fit-content;
+    }
+  </style>
+</head>
+<body>
+  <main class="stack">
+    <h1>Prueba de plugin <code>InputSwitchFriendly</code></h1>
+    <p class="note">Cambia los switches para ver el texto amigable. El bloque dinamico valida auto-init por MutationObserver.</p>
+
+    <section class="box">
+      <h2>Switch con label automatico (`for`)</h2>
+      <div class="row">
+        <input
+          id="newsletterSwitch"
+          type="checkbox"
+          data-role="friendly-switch"
+          data-friendly-switch-checked="Suscripcion activa"
+          data-friendly-switch-unchecked="Suscripcion inactiva" />
+
+        <label for="newsletterSwitch" class="state"></label>
+      </div>
+    </section>
+
+    <section class="box">
+      <h2>Switch con target explicito</h2>
+      <div class="row">
+        <input
+          id="alertsSwitch"
+          type="checkbox"
+          data-role="friendly-switch"
+          data-friendly-switch-target="#alertsState"
+          data-friendly-switch-checked="Alertas habilitadas"
+          data-friendly-switch-unchecked="Alertas deshabilitadas" />
+
+        <span id="alertsState" class="state"></span>
+      </div>
+    </section>
+
+    <button id="addDynamic" type="button">Agregar switch dinamico</button>
+    <section id="dynamicArea" class="box">
+      <h2>Switches dinamicos</h2>
+    </section>
+  </main>
+
+  <script src="./inputSwitchFriendly.js"></script>
+  <script>
+    // Bloque opcional para probar que el MutationObserver inicializa nuevos items.
+    let dynamicIndex = 1;
+    document.getElementById('addDynamic').addEventListener('click', function () {
+      const id = 'dynamicSwitch' + dynamicIndex;
+
+      document.getElementById('dynamicArea').insertAdjacentHTML(
+        'beforeend',
+        '<div class="row">' +
+          '<input ' +
+            'id="' + id + '" ' +
+            'type="checkbox" ' +
+            'data-role="friendly-switch" ' +
+            'data-friendly-switch-checked="ON #' + dynamicIndex + '" ' +
+            'data-friendly-switch-unchecked="OFF #' + dynamicIndex + '">' +
+          '<label for="' + id + '" class="state"></label>' +
+        '</div>'
+      );
+      dynamicIndex += 1;
+    });
+  </script>
+</body>
+</html>

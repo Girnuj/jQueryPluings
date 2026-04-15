@@ -19,6 +19,7 @@ ECMAScript 2020 esta soportado por la mayoria de navegadores modernos.
 - `ItemRemover`: elimina elementos contenedores desde un trigger de borrado.
 - `ReplaceMe`: reemplaza un trigger por HTML remoto obtenido mediante `POST` o `GET`.
 - `TemplateRenderizer`: renderiza plantillas HTML reemplazando placeholders como `{{propiedad}}` y rutas anidadas.
+- `InputSwitchFriendly`: muestra etiquetas amigables segun el estado de un switch/checkbox.
 
 ## Estructura del Repositorio
 
