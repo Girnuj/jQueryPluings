@@ -20,6 +20,7 @@ ECMAScript 2020 is supported by most modern browsers.
 - `ReplaceMe`: replaces a trigger with remote HTML fetched through `POST` or `GET`.
 - `TemplateRenderizer`: renders HTML templates by replacing placeholders like `{{property}}` and nested paths.
 - `InputSwitchFriendly`: displays friendly labels based on a switch/checkbox state.
+- `ChildSelect`: loads dependent options into a child select based on parent select value.
 
 ## Repository Structure
 

@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Test - ChildSelect</title>
+  <style>
+    body {
+      font-family: Segoe UI, Tahoma, sans-serif;
+      margin: 24px;
+      line-height: 1.4;
+      color: #222;
+      background: #f6f8fa;
+    }
+
+    .layout {
+      max-width: 760px;
+      margin: 0 auto;
+      display: grid;
+      gap: 14px;
+    }
+
+    .panel {
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      padding: 12px;
+      background: #fff;
+      display: grid;
+      gap: 10px;
+    }
+
+    .row {
+      display: grid;
+      gap: 6px;
+    }
+
+    select {
+      padding: 8px;
+      border: 1px solid #bbb;
+      border-radius: 6px;
+      background: #fff;
+    }
+
+    .loading {
+      outline: 2px solid #2f7ee6;
+      outline-offset: 1px;
+      background-image: linear-gradient(90deg, #eef4ff 25%, #ffffff 50%, #eef4ff 75%);
+      background-size: 200% 100%;
+      animation: pulse 0.8s linear infinite;
+    }
+
+    .note {
+      margin: 0;
+      color: #555;
+      font-size: 14px;
+    }
+
+    @keyframes pulse {
+      0% { background-position: 100% 0; }
+      100% { background-position: -100% 0; }
+    }
+  </style>
+</head>
+<body>
+  <main class="layout">
+    <h1>Prueba de plugin <code>ChildSelect</code></h1>
+    <p class="note">Selecciona categoria, luego subcategoria, y finalmente tecnologia. El flujo simula 3 selects anidados via API.</p>
+
+    <section class="panel">
+      <div class="row">
+        <label for="parentSelect">Categoria</label>
+        <select
+          id="parentSelect"
+          data-role="parent-select"
+          data-child-select="#childSelect"
+          data-children-url="/mock/categories"
+          data-value-property="id"
+          data-text-property="name"
+          data-empty-text="Seleccione una opcion"
+          data-disable-when-empty="true"
+          data-auto-select-single="true"
+          data-loading-class="loading">
+          <option value="">Seleccione categoria</option>
+          <option value="frontend">Frontend</option>
+          <option value="backend">Backend</option>
+          <option value="infra">Infraestructura</option>
+        </select>
+      </div>
+
+      <div class="row">
+        <label for="childSelect">Subcategoria</label>
+        <select
+          id="childSelect"
+          data-role="parent-select"
+          data-child-select="#grandchildSelect"
+          data-children-url="/mock/topics"
+          data-value-property="id"
+          data-text-property="name"
+          data-empty-text="Seleccione una opcion"
+          data-disable-when-empty="true"
+          data-auto-select-single="true"
+          data-loading-class="loading"
+          disabled>
+          <option value="">Seleccione una opcion</option>
+        </select>
+      </div>
+
+      <div class="row">
+        <label for="grandchildSelect">Tecnologia</label>
+        <select id="grandchildSelect" disabled>
+          <option value="">Seleccione una opcion</option>
+        </select>
+      </div>
+    </section>
+  </main>
+  
+  <script src="./childselect.js"></script>
+  <script>
+    // Mock de API para probar localmente sin backend.
+    (function () {
+      const mockData = {
+        frontend: [
+          { id: 'react', name: 'React' },
+          { id: 'vue', name: 'Vue' },
+          { id: 'svelte', name: 'Svelte' }
+        ],
+        backend: [
+          { id: 'node', name: 'Node.js' },
+          { id: 'dotnet', name: '.NET' }
+        ],
+        infra: [
+          { id: 'docker', name: 'Docker' }
+        ]
+      }
+      , mockTopics = {
+        react: [
+          { id: 'hooks', name: 'Hooks' },
+          { id: 'router', name: 'React Router' }
+        ],
+        vue: [
+          { id: 'pinia', name: 'Pinia' },
+          { id: 'nuxt', name: 'Nuxt' }
+        ],
+        svelte: [
+          { id: 'kit', name: 'SvelteKit' }
+        ],
+        node: [
+          { id: 'express', name: 'Express' },
+          { id: 'fastify', name: 'Fastify' }
+        ],
+        dotnet: [
+          { id: 'aspnet', name: 'ASP.NET Core' }
+        ],
+        docker: [
+          { id: 'compose', name: 'Docker Compose' }
+        ]
+      };
+
+      const originalFetch = window.fetch.bind(window);
+
+      window.fetch = function (input, init) {
+        const urlText = typeof input === 'string' ? input : input.url;
+        const url = new URL(urlText, window.location.href);
+
+        if (url.pathname === '/mock/categories') {
+          const id = url.searchParams.get('id') || '';
+          const payload = mockData[id] || [];
+          return Promise.resolve(new Response(JSON.stringify(payload), {
+            status: 200,
+            headers: { 'Content-Type': 'application/json' }
+          }));
+        }
+
+        if (url.pathname === '/mock/topics') {
+          const id = url.searchParams.get('id') || '';
+          const payload = mockTopics[id] || [];
+          return Promise.resolve(new Response(JSON.stringify(payload), {
+            status: 200,
+            headers: { 'Content-Type': 'application/json' }
+          }));
+        }
+
+        return originalFetch(input, init);
+      };
+    })();
+  </script>
+</body>
+</html>
