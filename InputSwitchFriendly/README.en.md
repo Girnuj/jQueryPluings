@@ -104,3 +104,13 @@ You can open the test file included in this project:
 
 - `test-input-switch-friendly.html`
 
+## Example Preview
+
+Initial HTML state:
+
+![InputSwitchFriendly initial example](./img/image.png)
+
+State with some inputs checked and others unchecked:
+
+![InputSwitchFriendly with mixed checks](./img/image2.png)
+
