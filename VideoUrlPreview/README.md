@@ -113,3 +113,13 @@ Puedes abrir el archivo de prueba incluido en este proyecto:
 
 - `test-video-url-preview.html`
 
+## Vista previa del ejemplo
+
+Estado inicial del HTML:
+
+![VideoUrlPreview ejemplo inicial](./img/image.png)
+
+Estado con un link de YouTube cargado (mostrando la preview):
+
+![VideoUrlPreview con preview cargada](./img/image2.png)
+

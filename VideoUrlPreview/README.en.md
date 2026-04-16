@@ -113,3 +113,13 @@ You can open the test file included in this project:
 
 - `test-video-url-preview.html`
 
+## Example Preview
+
+Initial HTML state:
+
+![VideoUrlPreview initial example](./img/image.png)
+
+State with a YouTube link loaded (preview shown):
+
+![VideoUrlPreview with loaded preview](./img/image2.png)
+
