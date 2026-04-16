@@ -1,0 +1,338 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Test - UIState</title>
+  <style>
+    :root {
+      --bg: #f7f3ea;
+      --card: #ffffff;
+      --ink: #1f2937;
+      --line: #e5d8bd;
+      --brand: #0f766e;
+      --error: #b91c1c;
+      --success: #166534;
+      --muted: #6b7280;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 24px;
+      background: linear-gradient(160deg, #f8f6f1, #f1e8d5);
+      color: var(--ink);
+      font-family: "Segoe UI", Tahoma, sans-serif;
+    }
+
+    .layout {
+      max-width: 980px;
+      margin: 0 auto;
+      display: grid;
+      gap: 16px;
+    }
+
+    .panel {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 14px;
+      box-shadow: 0 10px 24px rgba(31, 41, 55, 0.08);
+      display: grid;
+      gap: 10px;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    button {
+      border: 1px solid transparent;
+      background: var(--brand);
+      color: #fff;
+      border-radius: 8px;
+      padding: 10px 12px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .ghost {
+      background: #fff;
+      color: #334155;
+      border-color: #d1d5db;
+    }
+
+    .component-card {
+      border: 1px solid #d8c9a5;
+      border-radius: 12px;
+      padding: 16px;
+      background: #fffcf4;
+      transition: all 0.2s ease;
+      min-height: 150px;
+      display: grid;
+      gap: 8px;
+      align-content: start;
+    }
+
+    .is-state-loading {
+      background: #eef2ff;
+      border-color: #c7d2fe;
+      color: #4338ca;
+    }
+
+    .is-state-empty {
+      background: #f8fafc;
+      border-color: #cbd5e1;
+      color: var(--muted);
+    }
+
+    .is-state-error {
+      background: #fef2f2;
+      border-color: #fecaca;
+      color: var(--error);
+    }
+
+    .is-state-success {
+      background: #f0fdf4;
+      border-color: #bbf7d0;
+      color: var(--success);
+    }
+
+    .u-glow {
+      box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.22);
+    }
+
+    .u-outline-error {
+      outline: 2px dashed #ef4444;
+      outline-offset: 2px;
+    }
+
+    .u-border-strong {
+      border-width: 2px;
+    }
+
+    .u-fade {
+      opacity: 0.92;
+    }
+
+    .pill {
+      display: inline-block;
+      border-radius: 999px;
+      padding: 4px 8px;
+      font-size: 12px;
+      background: #f1f5f9;
+      color: #334155;
+    }
+
+    .log {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 8px;
+    }
+
+    .log li {
+      border: 1px solid #dbe3ec;
+      border-radius: 8px;
+      background: #fff;
+      padding: 8px 10px;
+      color: #334155;
+      font-size: 14px;
+    }
+
+    .designer-panel {
+      position: fixed;
+      right: 16px;
+      bottom: 16px;
+      width: min(320px, calc(100vw - 32px));
+      border: 1px solid #d9c7a2;
+      border-radius: 12px;
+      background: #fffdf8;
+      box-shadow: 0 14px 30px rgba(31, 41, 55, 0.16);
+      padding: 12px;
+      z-index: 1000;
+      display: grid;
+      gap: 8px;
+    }
+
+    .designer-grid {
+      display: grid;
+      gap: 8px;
+    }
+
+    .designer-grid label {
+      font-size: 13px;
+      color: #374151;
+      font-weight: 600;
+    }
+
+    .designer-grid input,
+    .designer-grid select {
+      width: 100%;
+      background: #fff;
+    }
+
+    .designer-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .designer-actions button {
+      flex: 1 1 auto;
+      min-width: 120px;
+    }
+
+    @media (max-width: 800px) {
+      .designer-panel {
+        position: static;
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="layout">
+    <!-- Bloque principal de demo: botones rapidos para cambiar estados del componente. -->
+    <section class="panel">
+      <h1>Prueba de plugin <code>UIState</code></h1>
+      <p>Permite cambiar estados visuales del componente para validacion de UX, QA y handoff con diseno.</p>
+
+      <div class="toolbar">
+        <button data-ui-state-trigger data-ui-state-target="#ticketCard" data-ui-state="loading">Loading</button>
+        <button data-ui-state-trigger data-ui-state-target="#ticketCard" data-ui-state="empty">Empty</button>
+        <button data-ui-state-trigger data-ui-state-target="#ticketCard" data-ui-state="error" data-ui-state-message="No se pudo cargar el ticket #A-102">Error</button>
+        <button data-ui-state-trigger data-ui-state-target="#ticketCard" data-ui-state="success" data-ui-state-message="Ticket actualizado correctamente">Success</button>
+        <button class="ghost" data-ui-state-trigger data-ui-state-target="#ticketCard" data-ui-state="restore">Restore</button>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Componente objetivo</h2>
+      <article
+        id="ticketCard"
+        class="component-card"
+        data-ui-state-host
+        data-ui-state-disable-on="loading"
+        data-ui-template-loading="#tplLoading"
+        data-ui-template-empty="#tplEmpty"
+        data-ui-template-error="#tplError"
+        data-ui-template-success="#tplSuccess"
+        data-ui-state-class-loading="is-state-loading u-glow u-fade"
+        data-ui-state-class-empty="is-state-empty u-fade"
+        data-ui-state-class-error="is-state-error u-outline-error u-border-strong"
+        data-ui-state-class-success="is-state-success u-glow"
+      >
+        <span class="pill">Estado base</span>
+        <h3>Ticket A-102</h3>
+        <p>Usuario reporta inconsistencia en el resumen de ventas de la semana.</p>
+        <button type="button">Accion interna</button>
+      </article>
+    </section>
+
+    <section class="panel">
+      <h2>Eventos</h2>
+      <ul id="log" class="log"></ul>
+    </section>
+
+    <!-- Panel de disenador: control manual para iterar estados/mensajes en vivo sin tocar el componente. -->
+    <aside class="designer-panel">
+      <strong>Panel rapido de disenador</strong>
+      <div class="designer-grid">
+        <label for="designerState">Estado</label>
+        <select id="designerState">
+          <option value="loading">loading</option>
+          <option value="empty">empty</option>
+          <option value="error">error</option>
+          <option value="success">success</option>
+        </select>
+
+        <label for="designerMessage">Mensaje (opcional)</label>
+        <input id="designerMessage" placeholder="Texto para template" />
+      </div>
+      <div class="designer-actions">
+        <button id="btnDesignerApply" type="button">Aplicar estado</button>
+        <button id="btnDesignerRestore" class="ghost" type="button">Restaurar</button>
+      </div>
+    </aside>
+  </main>
+
+  <template id="tplLoading">
+    <span class="pill">loading</span>
+    <h3>Sincronizando ticket...</h3>
+    <p>Estamos consultando servicios relacionados, espera unos segundos.</p>
+    <button type="button">Accion interna</button>
+  </template>
+
+  <template id="tplEmpty">
+    <span class="pill">empty</span>
+    <h3>No hay datos para mostrar</h3>
+    <p>Prueba cambiando los filtros o creando un nuevo registro.</p>
+    <button type="button">Accion interna</button>
+  </template>
+
+  <template id="tplError">
+    <span class="pill">error</span>
+    <h3>Error de carga</h3>
+    <p>{{message}}</p>
+    <button type="button">Reintentar</button>
+  </template>
+
+  <template id="tplSuccess">
+    <span class="pill">success</span>
+    <h3>Operacion completada</h3>
+    <p>{{message}}</p>
+    <button type="button">Ver detalle</button>
+  </template>
+
+  <script src="./uiState.min.js"></script>
+  <script>
+    (function () {
+      // Referencias de la vista de prueba y del panel flotante.
+      const host = document.getElementById('ticketCard')
+          , log = document.getElementById('log')
+          , designerState = document.getElementById('designerState')
+          , designerMessage = document.getElementById('designerMessage')
+          , btnDesignerApply = document.getElementById('btnDesignerApply')
+          , btnDesignerRestore = document.getElementById('btnDesignerRestore')
+          // Ejemplo: clases por estado definidas desde data-* en el host, sin mapear en JS.
+          // este es para el Panel de disenador, que no tiene data-attributes y se controla 100% por API.
+          , uiStateInstance = window.UIState.init(host);
+
+      function addLog(text) {
+        const li = document.createElement('li');
+        li.textContent = new Date().toLocaleTimeString() + ' - ' + text;
+        log.prepend(li);
+      }
+
+      host.addEventListener('before.plugin.uiState', function (evt) {
+        addLog('before.plugin.uiState -> ' + evt.detail.state);
+      });
+
+      host.addEventListener('changed.plugin.uiState', function (evt) {
+        addLog('changed.plugin.uiState -> ' + evt.detail.state);
+      });
+
+      host.addEventListener('restored.plugin.uiState', function () {
+        addLog('restored.plugin.uiState');
+      });
+
+      // Accion principal del panel: aplica el estado seleccionado sobre el host.
+      btnDesignerApply.addEventListener('click', function () {
+        const state = designerState.value
+            , message = designerMessage.value.trim();
+        uiStateInstance.setState(state, { message: message });
+      });
+
+      // Restaura el componente al estado base capturado por el plugin.
+      btnDesignerRestore.addEventListener('click', function () {
+        uiStateInstance.restore();
+      });
+    })();
+  </script>
+</body>
+</html>

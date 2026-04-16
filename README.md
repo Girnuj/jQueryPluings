@@ -16,16 +16,18 @@ Estos se inicializan solos al detectar los atributos HTML necesarios, asi que no
 
 ## Plugins Disponibles
 
+- `ChildSelect`: carga opciones dependientes en un select hijo a partir del valor del select padre.
+- `FormRequest`: extiende formularios nativos con envio asincrono via `fetch`, manejo de errores por campo, seguridad y control de retries/timeouts.
 - `ImgUploadPreview`: previsualiza imagenes seleccionadas desde un input file en un elemento `<img>`.
-- `VideoUrlPreview`: previsualiza videos de YouTube en un `<iframe>` a partir de una URL.
+- `InputSwitchFriendly`: muestra etiquetas amigables segun el estado de un switch/checkbox.
 - `ItemMover`: mueve elementos de una lista hacia arriba o hacia abajo usando triggers con atributos `data-*`.
 - `ItemRemover`: elimina elementos contenedores desde un trigger de borrado.
-- `ReplaceMe`: reemplaza un trigger por HTML remoto obtenido mediante `POST` o `GET`.
-- `TemplateRenderizer`: renderiza plantillas HTML reemplazando placeholders como `{{propiedad}}` y rutas anidadas.
-- `InputSwitchFriendly`: muestra etiquetas amigables segun el estado de un switch/checkbox.
-- `ChildSelect`: carga opciones dependientes en un select hijo a partir del valor del select padre.
 - `Modal`: abre y cierra modales usando triggers HTML con atributos `data-*` y API opcional.
 - `ModalSteps`: ejecuta flujos de modal por pasos, con carga remota de contenido, soporte `POST`/`GET` y eventos para controlar cada etapa.
+- `ReplaceMe`: reemplaza un trigger por HTML remoto obtenido mediante `POST` o `GET`.
+- `TemplateRenderizer`: renderiza plantillas HTML reemplazando placeholders como `{{propiedad}}` y rutas anidadas.
+- `UIState`: permite previsualizar estados de UI como loading, empty, error o success en componentes para QA y diseno.
+- `VideoUrlPreview`: previsualiza videos de YouTube en un `<iframe>` a partir de una URL.
 
 ## Requisitos Generales
 

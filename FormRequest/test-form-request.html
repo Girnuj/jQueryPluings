@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Test - FormRequest</title>
+  <style>
+    :root {
+      --bg: #eef2ff;
+      --card: #ffffff;
+      --ink: #0f172a;
+      --muted: #475569;
+      --line: #dbe3ec;
+      --brand: #0f766e;
+      --danger: #b91c1c;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 24px;
+      font-family: "Segoe UI", Tahoma, sans-serif;
+      color: var(--ink);
+      background: radial-gradient(circle at top right, #dbeafe, var(--bg));
+    }
+
+    .layout {
+      max-width: 920px;
+      margin: 0 auto;
+      display: grid;
+      gap: 14px;
+    }
+
+    .panel {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 14px;
+      box-shadow: 0 10px 24px rgba(2, 6, 23, 0.08);
+      display: grid;
+      gap: 10px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 14px;
+    }
+
+    .field {
+      display: grid;
+      gap: 6px;
+    }
+
+    input, select, button {
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 10px;
+      font: inherit;
+    }
+
+    button {
+      border-color: transparent;
+      background: var(--brand);
+      color: #fff;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .is-loading {
+      opacity: 0.65;
+      pointer-events: none;
+    }
+
+    .has-error {
+      border-color: #ef4444;
+      outline: none;
+    }
+
+    .form-error-message {
+      color: var(--danger);
+      font-size: 13px;
+    }
+
+    .result-box {
+      border: 1px dashed #94a3b8;
+      border-radius: 10px;
+      padding: 10px;
+      min-height: 88px;
+      background: #f8fafc;
+      color: #1e293b;
+    }
+
+    .log {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 8px;
+    }
+
+    .log li {
+      border: 1px solid #dbe3ec;
+      border-radius: 8px;
+      background: #fff;
+      padding: 8px 10px;
+      color: #334155;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <main class="layout">
+    <section class="panel">
+      <h1>Prueba de plugin <code>FormRequest</code></h1>
+      <p>Este test usa <code>fetch</code> simulado para validar flujos GET, POST, HTML y JSON sin backend.</p>
+    </section>
+
+    <section class="panel form-grid">
+      <article>
+        <h2>GET de consulta</h2>
+        <form
+          data-form-request
+          data-form-target="#resultGet"
+          action="/api/search"
+          method="get"
+        >
+          <div class="field">
+            <label for="q">Buscar</label>
+            <input id="q" name="q" placeholder="Ejemplo: modal" required />
+          </div>
+          <button type="submit">Consultar</button>
+        </form>
+        <div id="resultGet" class="result-box"></div>
+      </article>
+
+      <article>
+        <h2>POST con validacion</h2>
+        <form
+          data-form-request
+          data-form-target="#resultPost"
+          action="/api/users"
+          method="post"
+          data-form-reset-on-success="true"
+        >
+          <div class="field">
+            <label for="name">Nombre</label>
+            <input id="name" name="name" required />
+          </div>
+          <div class="field">
+            <label for="role">Rol</label>
+            <select id="role" name="role" required>
+              <option value="">Selecciona...</option>
+              <option value="dev">Developer</option>
+              <option value="qa">QA</option>
+            </select>
+          </div>
+          <button type="submit">Guardar usuario</button>
+        </form>
+        <div id="resultPost" class="result-box"></div>
+      </article>
+
+      <article>
+        <h2>Error de peticion (simulado)</h2>
+        <form
+          data-form-request
+          data-form-target="#resultFail"
+          action="/api/fail"
+          method="post"
+        >
+          <div class="field">
+            <label for="payload">Payload</label>
+            <input id="payload" name="payload" value="demo" required />
+          </div>
+          <button type="submit">Simular error de red</button>
+        </form>
+        <div id="resultFail" class="result-box"></div>
+      </article>
+    </section>
+
+    <section class="panel">
+      <h2>Eventos</h2>
+      <ul id="log" class="log"></ul>
+    </section>
+  </main>
+
+  <script src="./formRequest.js"></script>
+  <script>
+    (function () {
+      // Referencias de la vista de prueba.
+      const log = document.getElementById('log')
+          , forms = document.querySelectorAll('form[data-form-request]')
+          , failForm = document.querySelector('form[action="/api/fail"]')
+          , failResult = document.getElementById('resultFail');
+
+      function addLog(text) {
+        const li = document.createElement('li');
+        li.textContent = new Date().toLocaleTimeString() + ' - ' + text;
+        log.prepend(li);
+      }
+
+      // Eventos globales del plugin para cada formulario de la demo.
+      forms.forEach(function (form) {
+        form.addEventListener('before.plugin.formRequest', function (evt) {
+          addLog('before.plugin.formRequest -> ' + evt.detail.url);
+        });
+
+        form.addEventListener('success.plugin.formRequest', function () {
+          addLog('success.plugin.formRequest -> ' + (form.getAttribute('action') || 'sin action'));
+        });
+
+        form.addEventListener('error.plugin.formRequest', function () {
+          addLog('error.plugin.formRequest -> ' + (form.getAttribute('action') || 'sin action'));
+        });
+
+        form.addEventListener('complete.plugin.formRequest', function () {
+          addLog('complete.plugin.formRequest');
+        });
+      });
+
+      // Este formulario muestra un mensaje visual cuando ocurre un error de red.
+      failForm.addEventListener('error.plugin.formRequest', function (evt) {
+        const error = evt.detail && evt.detail.error ? evt.detail.error.message : 'Error inesperado';
+        failResult.innerHTML = [
+          '<div>',
+          '  <strong>Error de peticion detectado</strong>',
+          '  <p>Detalle: ' + error + '</p>',
+          '</div>'
+        ].join('');
+      });
+
+      const nativeFetch = window.fetch.bind(window);
+      // Mock de fetch para ejecutar escenarios sin backend real.
+      window.fetch = async function (url, options) {
+        const method = (options && options.method ? options.method : 'GET').toUpperCase();
+        const parsedUrl = new URL(String(url), window.location.href);
+
+        if (method === 'GET' && parsedUrl.pathname === '/api/search') {
+          const q = String(parsedUrl.searchParams.get('q') || '').trim();
+          const html = [
+            '<div>',
+            '  <strong>Resultado de GET</strong>',
+            '  <p>Busqueda: ' + (q || '(vacio)') + '</p>',
+            '</div>'
+          ].join('');
+
+          return new Response(html, {
+            status: 200,
+            headers: { 'Content-Type': 'text/html; charset=utf-8' }
+          });
+        }
+
+        if (method === 'POST' && parsedUrl.pathname === '/api/users') {
+          const body = options && options.body;
+          const name = body instanceof FormData ? String(body.get('name') || '').trim() : '';
+          const role = body instanceof FormData ? String(body.get('role') || '').trim() : '';
+
+          if (!name || !role) {
+            const errorData = {
+              errors: {
+                name: !name ? ['El nombre es obligatorio'] : [],
+                role: !role ? ['El rol es obligatorio'] : []
+              }
+            };
+
+            return new Response(JSON.stringify(errorData), {
+              status: 422,
+              headers: { 'Content-Type': 'application/json; charset=utf-8' }
+            });
+          }
+
+          const successHtml = [
+            '<div>',
+            '  <strong>Usuario creado</strong>',
+            '  <p>Nombre: ' + name + '</p>',
+            '  <p>Rol: ' + role + '</p>',
+            '</div>'
+          ].join('');
+
+          return new Response(successHtml, {
+            status: 201,
+            headers: { 'Content-Type': 'text/html; charset=utf-8' }
+          });
+        }
+
+        if (method === 'POST' && parsedUrl.pathname === '/api/fail') {
+          throw new Error('Fallo simulado de red para pruebas');
+        }
+
+        return nativeFetch(url, options);
+      };
+    })();
+  </script>
+</body>
+</html>

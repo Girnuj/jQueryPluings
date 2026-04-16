@@ -16,16 +16,18 @@ These are automatically initialized when they detect the necessary HTML attribut
 
 ## Available Plugins
 
+- `ChildSelect`: loads dependent options into a child select based on parent select value.
+- `FormRequest`: extends native forms with async `fetch` submission, field error handling, security controls, and retry/timeout behavior.
 - `ImgUploadPreview`: previews selected image files in an `<img>` element.
-- `VideoUrlPreview`: previews YouTube videos in an `<iframe>` from a URL.
+- `InputSwitchFriendly`: displays friendly labels based on a switch/checkbox state.
 - `ItemMover`: moves list elements up or down using `data-*` trigger attributes.
 - `ItemRemover`: removes container elements from a delete trigger.
-- `ReplaceMe`: replaces a trigger with remote HTML fetched through `POST` or `GET`.
-- `TemplateRenderizer`: renders HTML templates by replacing placeholders like `{{property}}` and nested paths.
-- `InputSwitchFriendly`: displays friendly labels based on a switch/checkbox state.
-- `ChildSelect`: loads dependent options into a child select based on parent select value.
 - `Modal`: opens and closes modals using HTML triggers with `data-*` attributes and optional API.
 - `ModalSteps`: runs step-based modal flows with remote content loading, `POST`/`GET` support, and events to control each stage.
+- `ReplaceMe`: replaces a trigger with remote HTML fetched through `POST` or `GET`.
+- `TemplateRenderizer`: renders HTML templates by replacing placeholders like `{{property}}` and nested paths.
+- `UIState`: lets teams preview UI states like loading, empty, error, or success for QA and design workflows.
+- `VideoUrlPreview`: previews YouTube videos in an `<iframe>` from a URL.
 
 ## General Requirements
 
