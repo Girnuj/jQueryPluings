@@ -3,7 +3,7 @@
 ## Introduction
 
 At some point, we have all needed to solve tasks like opening a modal, removing a DOM element, or moving it to a different position.
-This repository is a collection of useful native JavaScript plugins to make that work easier, without external libraries and without writing too much repetitive code.
+This repository is a collection of useful native JavaScript plugins to make that work easier, without external libraries and without writing too much repetitive code, the idea is that you take what you need when you need it and only that.
 
 Each plugin includes its source version (`.js`) so you can adapt it to your needs, and its minified version (`.min.js`) for direct usage.
 It can be useful for POC, SPA, or enterprise projects, working only with native JavaScript and HTML attributes.
@@ -18,6 +18,7 @@ These are automatically initialized when they detect the necessary HTML attribut
 
 - `ChildSelect`: loads dependent options into a child select based on parent select value.
 - `FormRequest`: extends native forms with async `fetch` submission, field error handling, security controls, and retry/timeout behavior.
+- `FormValidate`: adds extended `data-*` business-rule validations and blocks submit when rules fail.
 - `ImgUploadPreview`: previews selected image files in an `<img>` element.
 - `InputSwitchFriendly`: displays friendly labels based on a switch/checkbox state.
 - `ItemMover`: moves list elements up or down using `data-*` trigger attributes.

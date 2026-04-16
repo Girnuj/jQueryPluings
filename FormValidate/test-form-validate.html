@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FormValidate Demo</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 2rem;
+            background: #f5f7fb;
+            color: #1b263b;
+        }
+
+        .card {
+            max-width: 720px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 1px solid #dbe2ef;
+            border-radius: 12px;
+            padding: 1.25rem;
+            box-shadow: 0 10px 24px rgba(25, 42, 70, 0.08);
+        }
+
+        h1 {
+            margin-top: 0;
+        }
+
+        .row {
+            display: grid;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .inline {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.75rem;
+        }
+
+        label {
+            font-weight: 600;
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 0.6rem 0.7rem;
+            border: 1px solid #c5d0e6;
+            border-radius: 8px;
+            outline: none;
+        }
+
+        .is-invalid {
+            border-color: #d90429;
+            background: #fff5f5;
+        }
+
+        .is-valid {
+            border-color: #2a9d8f;
+            background: #f0fff8;
+        }
+
+        .u-invalid-red {
+            border-color: #b00020 !important;
+            background: #fff0f3 !important;
+            box-shadow: 0 0 0 2px rgba(176, 0, 32, 0.12);
+        }
+
+        .u-valid-green {
+            border-color: #1f7a4d !important;
+            background: #eefcf4 !important;
+            box-shadow: 0 0 0 2px rgba(31, 122, 77, 0.12);
+        }
+
+        .field-error {
+            min-height: 1.1rem;
+            font-size: 0.85rem;
+            color: #d90429;
+            margin-top: 0.2rem;
+        }
+
+        .summary {
+            border: 1px solid #f7cad0;
+            background: #fff4f6;
+            color: #8d0922;
+            border-radius: 8px;
+            padding: 0.75rem;
+            margin-bottom: 0.9rem;
+        }
+
+        .summary[hidden] {
+            display: none;
+        }
+
+        .checkbox-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.35rem;
+        }
+
+        .checkbox-grid label {
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        button {
+            border: 0;
+            background: #0b6dff;
+            color: #ffffff;
+            border-radius: 8px;
+            padding: 0.65rem 1rem;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .logs {
+            margin-top: 1rem;
+            background: #102a43;
+            color: #cbe6ff;
+            border-radius: 8px;
+            padding: 0.75rem;
+            min-height: 100px;
+            font-family: Consolas, monospace;
+            white-space: pre-wrap;
+        }
+
+        .demo-separator {
+            margin: 1.2rem 0;
+            border: 0;
+            border-top: 1px dashed #c8d4ea;
+        }
+
+        @media (max-width: 700px) {
+            .inline {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="card">
+        <h1>FormValidate + FormRequest</h1>
+        <p>
+            Este demo usa reglas extendidas por data-* sin repetir validaciones HTML nativas.
+        </p>
+        <p>
+            Tambien muestra clases visuales por campo con <strong>data-fv-invalid-class</strong> y <strong>data-fv-valid-class</strong>.
+        </p>
+
+          <!-- CASO 1: FormValidate + FormRequest (flujo asincrono con fetch) -->
+          <form id="demoForm"
+              data-form-validate
+              data-form-request
+              action="/api/demo"
+              method="post">
+
+            <div class="summary" data-form-validate-summary hidden></div>
+
+            <div class="inline row">
+                <div>
+                    <label for="username">Usuario (sin espacios)</label>
+                    <input id="username"
+                           name="username"
+                           type="text"
+                           required
+                           data-fv-no-whitespace="true"
+                            data-fv-invalid-class="u-invalid-red"
+                            data-fv-valid-class="u-valid-green"
+                           data-fv-message-no-whitespace="El usuario no puede tener espacios." />
+                    <div class="field-error" data-fv-message-for="username"></div>
+                </div>
+
+                <div>
+                    <label for="accountType">Tipo de cuenta</label>
+                    <select id="accountType" name="accountType">
+                        <option value="person">Persona</option>
+                        <option value="business">Empresa</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="inline row">
+                <div>
+                    <label for="companyId">RUC/ID empresa (solo si cuenta empresa)</label>
+                    <input id="companyId"
+                           name="companyId"
+                           type="text"
+                           data-fv-required-if="#accountType:business"
+                           data-fv-invalid-class="u-invalid-red"
+                           data-fv-valid-class="u-valid-green"
+                           data-fv-message-required-if="Debes completar el ID de empresa para cuenta empresa." />
+                    <div class="field-error" data-fv-message-for="companyId"></div>
+                </div>
+
+                <div>
+                    <label for="password">Password</label>
+                    <input id="password" name="password" type="password" />
+                </div>
+            </div>
+
+            <div class="inline row">
+                <div>
+                    <label for="passwordConfirm">Confirmar password</label>
+                    <input id="passwordConfirm"
+                           name="passwordConfirm"
+                           type="password"
+                           data-fv-equals="#password"
+                              data-fv-invalid-class="u-invalid-red"
+                              data-fv-valid-class="u-valid-green"
+                           data-fv-message-equals="La confirmacion no coincide con el password." />
+                    <div class="field-error" data-fv-message-for="passwordConfirm"></div>
+                </div>
+
+                <div>
+                    <label for="avatar">Avatar (max 1 archivo, max 1MB, jpg/png)</label>
+                    <input id="avatar"
+                           name="avatar"
+                           type="file"
+                           data-fv-max-files="1"
+                           data-fv-file-max-mb="1"
+                           data-fv-file-types="image/jpeg,image/png"
+                              data-fv-invalid-class="u-invalid-red"
+                              data-fv-valid-class="u-valid-green"
+                           data-fv-message-file-types="Solo JPG o PNG." />
+                    <div class="field-error" data-fv-message-for="avatar"></div>
+                </div>
+            </div>
+
+            <div class="row">
+                <label>Intereses (minimo 2)</label>
+                <div class="checkbox-grid">
+                    <label><input type="checkbox" name="interest" value="ux" data-fv-min-checked="2" /> UX</label>
+                    <label><input type="checkbox" name="interest" value="frontend" data-fv-min-checked="2" /> Frontend</label>
+                    <label><input type="checkbox" name="interest" value="backend" data-fv-min-checked="2" /> Backend</label>
+                    <label><input type="checkbox" name="interest" value="qa" data-fv-min-checked="2" /> QA</label>
+                </div>
+                <div class="field-error" data-fv-message-for="interest"></div>
+            </div>
+
+            <button type="submit">Enviar</button>
+        </form>
+
+        <hr class="demo-separator" />
+
+        <!-- CASO 2: FormValidate solo (formulario simple sin FormRequest) -->
+        <h2>Ejemplo simple (sin FormRequest)</h2>
+        <p>
+            Este formulario usa solo FormValidate. No tiene <strong>data-form-request</strong> ni inicializacion de FormRequest.
+        </p>
+
+        <form id="demoFormSimple"
+              data-form-validate
+              action="#"
+              method="post">
+
+            <div class="summary" data-form-validate-summary hidden></div>
+
+            <div class="inline row">
+                <div>
+                    <label for="simpleEmail">Email corporativo (sin espacios)</label>
+                    <input id="simpleEmail"
+                           name="simpleEmail"
+                           type="text"
+                           data-fv-no-whitespace="true"
+                           data-fv-invalid-class="u-invalid-red"
+                           data-fv-valid-class="u-valid-green"
+                           data-fv-message-no-whitespace="El email no debe tener espacios." />
+                    <div class="field-error" data-fv-message-for="simpleEmail"></div>
+                </div>
+
+                <div>
+                    <label for="simpleConfirm">Confirmar email</label>
+                    <input id="simpleConfirm"
+                           name="simpleConfirm"
+                           type="text"
+                           data-fv-equals="#simpleEmail"
+                           data-fv-invalid-class="u-invalid-red"
+                           data-fv-valid-class="u-valid-green"
+                           data-fv-message-equals="La confirmacion debe coincidir con el email." />
+                    <div class="field-error" data-fv-message-for="simpleConfirm"></div>
+                </div>
+            </div>
+
+            <button type="submit">Validar formulario simple</button>
+        </form>
+
+        <div id="logs" class="logs"></div>
+    </main>
+
+    <!-- Script para CASO 1 (si quieres usar solo CASO 2, puedes omitir este archivo) -->
+    <script src="../FormRequest/formRequest.min.js"></script>
+    <!-- Script principal para ambos casos -->
+    <script src="./formValidate.min.js"></script>
+    <script>
+        (function () {
+            var logs = document.querySelector('#logs')
+                , form = document.querySelector('#demoForm')
+                , simpleForm = document.querySelector('#demoFormSimple')
+                , originalFetch = window.fetch;
+
+            function log(message) {
+                logs.textContent += message + '\n';
+            }
+
+            window.fetch = function (_url, _init) {
+                return Promise.resolve(new Response(JSON.stringify({ ok: true, message: 'Demo enviada' }), {
+                    status: 200,
+                    headers: { 'Content-Type': 'application/json' }
+                }));
+            };
+
+            window.FormRequest.init(form, {
+                onSuccess: function (data) {
+                    log('FormRequest success: ' + JSON.stringify(data));
+                },
+                onError: function (_data, response, error) {
+                    log('FormRequest error: ' + ((response && response.status) || (error && error.message) || 'desconocido'));
+                }
+            });
+
+            form.addEventListener('invalid.plugin.formValidate', function (evt) {
+                log('FormValidate invalid: ' + evt.detail.errors.length + ' error(es)');
+            });
+
+            form.addEventListener('valid.plugin.formValidate', function () {
+                log('FormValidate valid: reglas extendidas OK');
+            });
+
+            simpleForm.addEventListener('submit', function (evt) {
+                evt.preventDefault();
+                log('Submit local en formulario simple (sin FormRequest).');
+            });
+
+            simpleForm.addEventListener('invalid.plugin.formValidate', function (evt) {
+                log('Simple invalid: ' + evt.detail.errors.length + ' error(es)');
+            });
+
+            simpleForm.addEventListener('valid.plugin.formValidate', function () {
+                log('Simple valid: validaciones extendidas OK');
+            });
+
+            window.addEventListener('beforeunload', function () {
+                window.fetch = originalFetch;
+            });
+        })();
+    </script>
+</body>
+</html>

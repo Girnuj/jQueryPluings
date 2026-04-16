@@ -3,7 +3,7 @@
 ## Introduccion
 
 Todos hemos tenido que resolver alguna vez tareas como abrir un modal, eliminar un elemento del DOM o moverlo de lugar.
-Este repositorio es una coleccion de plugins utiles en JavaScript nativo para facilitar ese trabajo sin depender de librerias externas ni escribir demasiado codigo repetitivo.
+Este repositorio es una coleccion de plugins utiles en JavaScript nativo para facilitar ese trabajo sin depender de librerias externas ni escribir demasiado codigo repetitivo, la idea es que tomes lo que necesites cuando lo necesites y solo eso.
 
 Cada plugin incluye su version fuente (`.js`) para que puedas adaptarlo a tu gusto, y su version minificada (`.min.js`) para usarla directamente.
 Puede servirte para POC, SPA o proyectos empresariales, trabajando solo con JavaScript nativo y atributos HTML.
@@ -18,6 +18,7 @@ Estos se inicializan solos al detectar los atributos HTML necesarios, asi que no
 
 - `ChildSelect`: carga opciones dependientes en un select hijo a partir del valor del select padre.
 - `FormRequest`: extiende formularios nativos con envio asincrono via `fetch`, manejo de errores por campo, seguridad y control de retries/timeouts.
+- `FormValidate`: agrega validaciones extendidas por `data-*` para reglas de negocio y bloquea envio cuando no se cumplen.
 - `ImgUploadPreview`: previsualiza imagenes seleccionadas desde un input file en un elemento `<img>`.
 - `InputSwitchFriendly`: muestra etiquetas amigables segun el estado de un switch/checkbox.
 - `ItemMover`: mueve elementos de una lista hacia arriba o hacia abajo usando triggers con atributos `data-*`.
