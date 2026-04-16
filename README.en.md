@@ -25,6 +25,7 @@ These are automatically initialized when they detect the necessary HTML attribut
 - `ItemRemover`: removes container elements from a delete trigger.
 - `Modal`: opens and closes modals using HTML triggers with `data-*` attributes and optional API.
 - `ModalSteps`: runs step-based modal flows with remote content loading, `POST`/`GET` support, and events to control each stage.
+- `NotificationPush`: triggers toast notifications and sends dynamic `data-np-*` payload to a receiver or endpoint without local cache.
 - `ReplaceMe`: replaces a trigger with remote HTML fetched through `POST` or `GET`.
 - `TemplateRenderizer`: renders HTML templates by replacing placeholders like `{{property}}` and nested paths.
 - `UIState`: lets teams preview UI states like loading, empty, error, or success for QA and design workflows.

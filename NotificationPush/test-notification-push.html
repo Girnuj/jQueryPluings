@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NotificationPush Demo</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f4f7fb;
+            color: #1d2a3b;
+            padding: 1.2rem;
+        }
+
+        .layout {
+            max-width: 1080px;
+            margin: 0 auto;
+            display: grid;
+            gap: 1rem;
+            grid-template-columns: 2fr 1fr;
+        }
+
+        .panel {
+            background: #ffffff;
+            border: 1px solid #dfe7f2;
+            border-radius: 12px;
+            padding: 1rem;
+            box-shadow: 0 10px 22px rgba(20, 34, 58, 0.08);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.9rem;
+        }
+
+        .card {
+            border: 1px solid #d9e3f3;
+            border-radius: 10px;
+            padding: 0.8rem;
+            background: #fbfdff;
+        }
+
+        .card h3 {
+            margin: 0 0 0.35rem;
+            font-size: 1rem;
+        }
+
+        .price {
+            margin: 0 0 0.5rem;
+            color: #334155;
+            font-weight: 700;
+        }
+
+        .btn {
+            border: 0;
+            background: #115ad2;
+            color: #fff;
+            border-radius: 8px;
+            padding: 0.55rem 0.8rem;
+            cursor: pointer;
+            font-weight: 600;
+            width: 100%;
+        }
+
+        .receiver {
+            font-family: Consolas, monospace;
+            font-size: 0.83rem;
+            white-space: pre-wrap;
+            min-height: 120px;
+            border: 1px dashed #c9d6ea;
+            border-radius: 8px;
+            padding: 0.6rem;
+            background: #f8fbff;
+        }
+
+        .field-list {
+            display: grid;
+            gap: 0.35rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .field-list span {
+            display: grid;
+            grid-template-columns: 86px 1fr;
+            gap: 0.35rem;
+        }
+
+        .logs {
+            margin-top: 0.8rem;
+            background: #0f2746;
+            color: #cae5ff;
+            border-radius: 8px;
+            min-height: 110px;
+            padding: 0.65rem;
+            white-space: pre-wrap;
+            font-family: Consolas, monospace;
+            font-size: 0.78rem;
+        }
+
+        .totals {
+            margin-top: 0.8rem;
+            border: 1px solid #cfe0f8;
+            background: #eef5ff;
+            border-radius: 8px;
+            padding: 0.65rem;
+            display: grid;
+            gap: 0.35rem;
+        }
+
+        .totals strong {
+            color: #0a3b86;
+        }
+
+        .my-toast-stack {
+            position: fixed;
+            left: 18px;
+            bottom: 18px;
+            width: min(360px, calc(100vw - 36px));
+            display: grid;
+            gap: 10px;
+            z-index: 99998;
+        }
+
+        .my-toast {
+            border-radius: 14px;
+            border: 2px solid #111827;
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            color: #f8fafc;
+            padding: 12px 14px;
+            box-shadow: 0 12px 28px rgba(2, 6, 23, 0.35);
+        }
+
+        .my-toast .np-toast__top {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .my-toast .np-toast__title {
+            margin: 0;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #f8fafc;
+        }
+
+        .my-toast .np-toast__message {
+            margin: 0.35rem 0 0;
+            font-size: 0.85rem;
+            color: #cbd5e1;
+        }
+
+        .my-toast .np-toast__close {
+            border: 0;
+            background: #334155;
+            color: #fff;
+            border-radius: 999px;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+        }
+
+        .my-toast--ok {
+            border-left: 6px solid #22c55e;
+        }
+
+        @media (max-width: 900px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="layout">
+        <section class="panel">
+            <h1>NotificationPush - eCommerce demo</h1>
+            <p>
+                Cada boton envia payload por <code>data-np-*</code>, dispara toast y actualiza un receptor externo.
+            </p>
+
+            <div class="grid">
+                <article class="card">
+                    <h3>Nike Air Zoom</h3>
+                    <p class="price">$139.00</p>
+                    <button
+                        class="btn"
+                        data-notification-push
+                        data-np-title="Producto agregado"
+                        data-np-message="Nike Air Zoom x1 agregado al carrito"
+                        data-np-type="success"
+                        data-np-duration="2600"
+                        data-np-target="#cartReceiver"
+                        data-np-product-id="P-1001"
+                        data-np-sku="NZ-42"
+                        data-np-name="Nike Air Zoom"
+                        data-np-price="139.00"
+                        data-np-qty="1"
+                        data-np-name-stock="12"
+                        data-np-name-size="42"
+                        data-np-name-currency="USD"
+                    >
+                        Agregar al carrito
+                    </button>
+                </article>
+
+                <article class="card">
+                    <h3>Adidas Pulse Runner</h3>
+                    <p class="price">$119.00</p>
+                    <button
+                        class="btn"
+                        data-notification-push
+                        data-np-title="Wishlist"
+                        data-np-message="Adidas Pulse Runner agregado a favoritos"
+                        data-np-type="info"
+                        data-np-duration="3000"
+                        data-np-target="#cartReceiver"
+                        data-np-product-id="P-2209"
+                        data-np-sku="APR-41"
+                        data-np-name="Adidas Pulse Runner"
+                        data-np-price="119.00"
+                        data-np-qty="1"
+                        data-np-name-color="Black"
+                        data-np-name-gender="Unisex"
+                        data-np-name-origin="MX"
+                    >
+                        Guardar en favoritos
+                    </button>
+                </article>
+
+                <article class="card">
+                    <h3>Puma Velocity Pro</h3>
+                    <p class="price">$99.50</p>
+                    <button
+                        class="btn"
+                        data-notification-push
+                        data-np-title="Producto agregado"
+                        data-np-message="Puma Velocity Pro x2 agregado al carrito"
+                        data-np-type="success"
+                        data-np-duration="2500"
+                        data-np-target="#cartReceiver"
+                        data-np-product-id="P-3307"
+                        data-np-sku="PVP-40"
+                        data-np-name="Puma Velocity Pro"
+                        data-np-price="99.50"
+                        data-np-qty="2"
+                        data-np-name-size="40"
+                        data-np-name-currency="USD"
+                    >
+                        Agregar 2 al carrito
+                    </button>
+                </article>
+
+                <article class="card">
+                    <h3>Reebok Nano Street</h3>
+                    <p class="price">$149.90</p>
+                    <button
+                        class="btn"
+                        data-notification-push
+                        data-np-title="Producto agregado"
+                        data-np-message="Reebok Nano Street x1 agregado al carrito"
+                        data-np-type="warning"
+                        data-np-duration="2800"
+                        data-np-target="#cartReceiver"
+                        data-np-product-id="P-4418"
+                        data-np-sku="RNS-43"
+                        data-np-name="Reebok Nano Street"
+                        data-np-price="149.90"
+                        data-np-qty="1"
+                        data-np-name-size="43"
+                        data-np-name-currency="USD"
+                    >
+                        Agregar al carrito
+                    </button>
+                </article>
+
+                <article class="card">
+                    <h3>Custom Toast Demo</h3>
+                    <p class="price">$79.00</p>
+                    <button
+                        class="btn"
+                        data-notification-push
+                        data-np-title="Toast personalizado"
+                        data-np-message="Este usa tu CSS, no el estilo interno del plugin"
+                        data-np-type="success"
+                        data-np-duration="3400"
+                        data-np-target="#cartReceiver"
+                        data-np-inject-styles="false"
+                        data-np-toast-class="my-toast my-toast--ok"
+                        data-np-toast-container-class="my-toast-stack"
+                        data-np-product-id="P-CUSTOM"
+                        data-np-sku="CST-01"
+                        data-np-name="Custom Product"
+                        data-np-price="79.00"
+                        data-np-qty="1"
+                        data-np-name-size="N/A"
+                        data-np-name-currency="USD"
+                    >
+                        Lanzar custom toast
+                    </button>
+                </article>
+            </div>
+        </section>
+
+        <aside id="cartReceiverPanel" class="panel">
+            <h2>Receptor del push</h2>
+            <p>
+                Este elemento recibe la data desde el boton por <code>data-np-target</code>.
+            </p>
+
+            <div id="cartReceiver" data-np-receiver data-np-receiver-format="json" data-np-field-root="#cartReceiverPanel" class="receiver"></div>
+
+            <div class="field-list">
+                <span><strong>name:</strong> <em data-np-field="name"></em></span>
+                <span><strong>sku:</strong> <em data-np-field="sku"></em></span>
+                <span><strong>price:</strong> <em data-np-field="price"></em></span>
+                <span><strong>size:</strong> <em data-np-field="size"></em></span>
+                <span><strong>currency:</strong> <em data-np-field="currency"></em></span>
+            </div>
+
+            <div class="totals">
+                <span><strong>Total productos:</strong> <em id="totalQty">0</em></span>
+                <span><strong>Total importe:</strong> <em id="totalAmount">$0.00</em></span>
+            </div>
+
+            <div id="logs" class="logs"></div>
+        </aside>
+    </main>
+
+    <script src="./notificationPush.min.js"></script>
+    <script>
+        (function () {
+            const logs = document.querySelector('#logs')
+                , receiver = document.querySelector('#cartReceiver')
+                , totalQtyEl = document.querySelector('#totalQty')
+                , totalAmountEl = document.querySelector('#totalAmount')
+                , triggers = Array.from(document.querySelectorAll('[data-notification-push]'));
+
+            let totalQty = 0
+                , totalAmount = 0;
+
+            function parseNumeric(value, fallback) {
+                const parsed = Number(value);
+                return Number.isFinite(parsed) ? parsed : fallback;
+            }
+
+            function refreshTotals() {
+                totalQtyEl.textContent = String(totalQty);
+                totalAmountEl.textContent = '$' + totalAmount.toFixed(2);
+            }
+
+            function log(line) {
+                logs.textContent += line + '\n';
+            }
+
+            receiver.addEventListener('push.plugin.notificationPush', function (evt) {
+                const payload = evt.detail.payload
+                    , qty = Math.max(0, parseNumeric(payload.qty, 1))
+                    , price = Math.max(0, parseNumeric(payload.price, 0));
+
+                totalQty += qty;
+                totalAmount += qty * price;
+                refreshTotals();
+
+                log('receiver push: ' + JSON.stringify(payload));
+            });
+
+            triggers.forEach(function (trigger) {
+                trigger.addEventListener('shown.plugin.notificationPush', function (evt) {
+                    log('shown: ' + evt.detail.payload.title);
+                });
+
+                trigger.addEventListener('error.plugin.notificationPush', function (evt) {
+                    log('error: ' + (evt.detail.error && evt.detail.error.message));
+                });
+            });
+        })();
+    </script>
+</body>
+</html>

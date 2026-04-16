@@ -25,6 +25,7 @@ Estos se inicializan solos al detectar los atributos HTML necesarios, asi que no
 - `ItemRemover`: elimina elementos contenedores desde un trigger de borrado.
 - `Modal`: abre y cierra modales usando triggers HTML con atributos `data-*` y API opcional.
 - `ModalSteps`: ejecuta flujos de modal por pasos, con carga remota de contenido, soporte `POST`/`GET` y eventos para controlar cada etapa.
+- `NotificationPush`: dispara notificaciones tipo toast y envia payload dinamico por `data-np-*` a un receptor o endpoint sin cache local.
 - `ReplaceMe`: reemplaza un trigger por HTML remoto obtenido mediante `POST` o `GET`.
 - `TemplateRenderizer`: renderiza plantillas HTML reemplazando placeholders como `{{propiedad}}` y rutas anidadas.
 - `UIState`: permite previsualizar estados de UI como loading, empty, error o success en componentes para QA y diseno.
