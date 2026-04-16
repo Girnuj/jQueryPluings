@@ -14,6 +14,18 @@ A collection of JavaScript plugins for DOM manipulation, organized by folder.
 No external dependencies.
 These are automatically initialized when they detect the necessary HTML attributes, so you don't have to worry about writing JS; you can also opt for manual initialization.
 
+## Available Plugins
+
+- `ImgUploadPreview`: previews selected image files in an `<img>` element.
+- `VideoUrlPreview`: previews YouTube videos in an `<iframe>` from a URL.
+- `ItemMover`: moves list elements up or down using `data-*` trigger attributes.
+- `ItemRemover`: removes container elements from a delete trigger.
+- `ReplaceMe`: replaces a trigger with remote HTML fetched through `POST` or `GET`.
+- `TemplateRenderizer`: renders HTML templates by replacing placeholders like `{{property}}` and nested paths.
+- `InputSwitchFriendly`: displays friendly labels based on a switch/checkbox state.
+- `ChildSelect`: loads dependent options into a child select based on parent select value.
+- `Modal`: opens and closes modals using HTML triggers with `data-*` attributes and optional API.
+
 ## General Requirements
 
 - JavaScript using ECMAScript 2020 (ECMA-2020) syntax
@@ -26,17 +38,6 @@ ECMAScript 2020 is supported by most modern browsers.
 Each plugin includes a minified build (`*.min.js`) inside its own folder.
 If you do not need to read or debug source code, use the minified file for a lighter production integration.
 
-## Available Plugins
-
-- `ImgUploadPreview`: previews selected image files in an `<img>` element.
-- `VideoUrlPreview`: previews YouTube videos in an `<iframe>` from a URL.
-- `ItemMover`: moves list elements up or down using `data-*` trigger attributes.
-- `ItemRemover`: removes container elements from a delete trigger.
-- `ReplaceMe`: replaces a trigger with remote HTML fetched through `POST` or `GET`.
-- `TemplateRenderizer`: renders HTML templates by replacing placeholders like `{{property}}` and nested paths.
-- `InputSwitchFriendly`: displays friendly labels based on a switch/checkbox state.
-- `ChildSelect`: loads dependent options into a child select based on parent select value.
-- `Modal`: opens and closes modals using HTML triggers with `data-*` attributes and optional API.
 
 ## Repository Structure
 

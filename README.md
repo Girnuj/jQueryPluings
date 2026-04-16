@@ -14,6 +14,18 @@ Coleccion de plugins JavaScript para manipulacion del DOM organizados por carpet
 Sin dependencias externas!!.
 Estos se inicializan solos al detectar los atributos HTML necesarios, asi que no tienes que preocuparte por escribir JS, tambien puedes optar por la inicializacion manual.
 
+## Plugins Disponibles
+
+- `ImgUploadPreview`: previsualiza imagenes seleccionadas desde un input file en un elemento `<img>`.
+- `VideoUrlPreview`: previsualiza videos de YouTube en un `<iframe>` a partir de una URL.
+- `ItemMover`: mueve elementos de una lista hacia arriba o hacia abajo usando triggers con atributos `data-*`.
+- `ItemRemover`: elimina elementos contenedores desde un trigger de borrado.
+- `ReplaceMe`: reemplaza un trigger por HTML remoto obtenido mediante `POST` o `GET`.
+- `TemplateRenderizer`: renderiza plantillas HTML reemplazando placeholders como `{{propiedad}}` y rutas anidadas.
+- `InputSwitchFriendly`: muestra etiquetas amigables segun el estado de un switch/checkbox.
+- `ChildSelect`: carga opciones dependientes en un select hijo a partir del valor del select padre.
+- `Modal`: abre y cierra modales usando triggers HTML con atributos `data-*` y API opcional.
+
 ## Requisitos Generales
 
 - JavaScript con sintaxis ECMAScript 2020 (ECMA-2020)
@@ -26,17 +38,6 @@ ECMAScript 2020 esta soportado por la mayoria de navegadores modernos.
 Cada plugin incluye su version minificada (`*.min.js`) dentro de su propia carpeta.
 Si no necesitas leer o depurar el codigo fuente, usa el archivo minificado para una integracion mas ligera en produccion.
 
-## Plugins Disponibles
-
-- `ImgUploadPreview`: previsualiza imagenes seleccionadas desde un input file en un elemento `<img>`.
-- `VideoUrlPreview`: previsualiza videos de YouTube en un `<iframe>` a partir de una URL.
-- `ItemMover`: mueve elementos de una lista hacia arriba o hacia abajo usando triggers con atributos `data-*`.
-- `ItemRemover`: elimina elementos contenedores desde un trigger de borrado.
-- `ReplaceMe`: reemplaza un trigger por HTML remoto obtenido mediante `POST` o `GET`.
-- `TemplateRenderizer`: renderiza plantillas HTML reemplazando placeholders como `{{propiedad}}` y rutas anidadas.
-- `InputSwitchFriendly`: muestra etiquetas amigables segun el estado de un switch/checkbox.
-- `ChildSelect`: carga opciones dependientes en un select hijo a partir del valor del select padre.
-- `Modal`: abre y cierra modales usando triggers HTML con atributos `data-*` y API opcional.
 
 ## Estructura del Repositorio
 
