@@ -121,3 +121,13 @@ You can open the test file included in this project:
 
 - `test-item-mover.html`
 
+## Example Preview
+
+Initial HTML state:
+
+![ItemMover initial example](./img/image.png)
+
+State with some items moved from their original position:
+
+![ItemMover with moved items](./img/image2.png)
+
