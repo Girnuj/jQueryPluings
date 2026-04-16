@@ -1,8 +1,18 @@
 # Plugins
 
+## Introduccion
+
+Todos hemos tenido que resolver alguna vez tareas como abrir un modal, eliminar un elemento del DOM o moverlo de lugar.
+Este repositorio es una coleccion de plugins utiles en JavaScript nativo para facilitar ese trabajo sin depender de librerias externas ni escribir demasiado codigo repetitivo.
+
+Cada plugin incluye su version fuente (`.js`) para que puedas adaptarlo a tu gusto, y su version minificada (`.min.js`) para usarla directamente.
+Puede servirte para POC, SPA o proyectos empresariales, trabajando solo con JavaScript nativo y atributos HTML.
+
+Si es tu primera vez aqui, te recomiendo revisar al menos el README de cada plugin para conocer rapidamente que problema resuelve y como integrarlo.
+
 Coleccion de plugins JavaScript para manipulacion del DOM organizados por carpeta.
-Sin dependencias externas.
-Estos se inicializan solos al detectar los atributos HTML necesarios, asi no tienes que preocuparte por escribir JS, tambien puedes optar por la inicializacion manual.
+Sin dependencias externas!!.
+Estos se inicializan solos al detectar los atributos HTML necesarios, asi que no tienes que preocuparte por escribir JS, tambien puedes optar por la inicializacion manual.
 
 ## Requisitos Generales
 
@@ -68,4 +78,4 @@ En cada carpeta de plugin:
 
 ## Objetivo
 
-Mantener una biblioteca de plugins simple, reutilizable y bien documentada para que cualquier persona pueda integrarlos rapido en sus proyectos copiando solamente el JS(pluginName.js) e incorporandolos en sus proyectos o vistas necesarias de una forma muy simple.
+Mantener una biblioteca de plugins simple, reutilizable y bien documentada para que cualquier persona pueda integrarlos rapido en sus proyectos copiando solamente el JS(pluginName.js) o su version .min e incorporandolos en sus proyectos o vistas necesarias de una forma muy simple y liviana.
