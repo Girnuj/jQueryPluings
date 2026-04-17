@@ -16,6 +16,12 @@ Most projects repeat the same code for:
 
 RequestState centralizes this into a declarative, reusable plugin.
 
+## Origin and scope
+
+RequestState started mainly with the goal of executing requests and rendering content declaratively in the UI, avoiding repeated `fetch` and visual-feedback logic across views.
+
+Over time it evolved into a fairly complete plugin: beyond request/response handling, it now covers lifecycle states (`idle/loading/success/error`), messages, per-state classes, retries, timeout, mock mode for QA, dynamic payload support, and events to integrate with other plugins such as `FormRequest` and `FormValidate`.
+
 ## Benefits
 
 - Declarative flow with `data-request-state`.
