@@ -142,6 +142,16 @@
       background: #e2e8f0;
       color: #0f172a;
     }
+
+    .warn {
+      background: #facc15;
+      color: #111827;
+    }
+
+    .is-loading {
+      opacity: 0.7;
+      pointer-events: none;
+    }
   </style>
 </head>
 <body data-pp-observe-root-confirm-action>
@@ -202,6 +212,13 @@
           data-ca-title="Resetear configuracion"
           data-ca-message="Se perderan cambios no guardados. Deseas continuar?"
           data-ca-dialog="#customConfirm"
+          data-ca-confirm-text="Si, resetear"
+          data-ca-cancel-text="Mantener cambios"
+          data-ca-deny-text="Solo limpiar filtros"
+          data-ca-confirm-class="danger"
+          data-ca-cancel-class="ghost"
+          data-ca-deny-class="warn"
+          data-ca-allow-outside-click="false"
         >
           Resetear configuracion
         </button>
@@ -220,6 +237,7 @@
       <p data-ca-dialog-message></p>
       <div class="confirm-actions">
         <button type="button" class="ghost" data-ca-cancel>Cancelar</button>
+        <button type="button" class="warn" data-ca-deny hidden>Denegar</button>
         <button type="button" class="danger" data-ca-confirm>Confirmar</button>
       </div>
     </section>
@@ -249,6 +267,21 @@
         subject.addEventListener('cancelled.plugin.confirmAction', function (evt) {
           addLog('cancelled.plugin.confirmAction -> ' + evt.detail.actionType);
         });
+
+        subject.addEventListener('denied.plugin.confirmAction', function (evt) {
+          addLog('denied.plugin.confirmAction -> ' + evt.detail.actionType);
+        });
+      });
+
+      const btnReset = document.getElementById('btnReset');
+      window.ConfirmAction.destroy(btnReset);
+      window.ConfirmAction.init(btnReset, {
+        preConfirm: async function () {
+          await new Promise(function (resolve) {
+            setTimeout(resolve, 700);
+          });
+          return true;
+        }
       });
 
       // Evita navegacion real en la demo para mantener el log visible.

@@ -18,9 +18,21 @@
         enabled: true,
         dialogSelector: '',
         confirmAdapter: null,
+        preConfirm: null,
+        confirmText: 'Confirmar',
+        cancelText: 'Cancelar',
+        denyText: '',
+        confirmClass: '',
+        cancelClass: '',
+        denyClass: '',
+        loadingClass: 'is-loading',
+        allowEscape: true,
+        allowOutsideClick: true,
+        focusConfirm: true,
         beforeConfirm: function () { },
         onConfirm: function () { },
         onCancel: function () { },
+        onDeny: function () { },
     });
 
     const parseBoolean = (value) => {
@@ -77,6 +89,50 @@
             options.dialogSelector = element.dataset.caDialog.trim();
         }
 
+        if (typeof element.dataset.caConfirmText === 'string' && element.dataset.caConfirmText.trim()) {
+            options.confirmText = element.dataset.caConfirmText.trim();
+        }
+
+        if (typeof element.dataset.caCancelText === 'string' && element.dataset.caCancelText.trim()) {
+            options.cancelText = element.dataset.caCancelText.trim();
+        }
+
+        if (typeof element.dataset.caDenyText === 'string' && element.dataset.caDenyText.trim()) {
+            options.denyText = element.dataset.caDenyText.trim();
+        }
+
+        if (typeof element.dataset.caConfirmClass === 'string' && element.dataset.caConfirmClass.trim()) {
+            options.confirmClass = element.dataset.caConfirmClass.trim();
+        }
+
+        if (typeof element.dataset.caCancelClass === 'string' && element.dataset.caCancelClass.trim()) {
+            options.cancelClass = element.dataset.caCancelClass.trim();
+        }
+
+        if (typeof element.dataset.caDenyClass === 'string' && element.dataset.caDenyClass.trim()) {
+            options.denyClass = element.dataset.caDenyClass.trim();
+        }
+
+        if (typeof element.dataset.caLoadingClass === 'string' && element.dataset.caLoadingClass.trim()) {
+            options.loadingClass = element.dataset.caLoadingClass.trim();
+        }
+
+        const allowEscape = parseBoolean(element.dataset.caAllowEscape)
+            , allowOutsideClick = parseBoolean(element.dataset.caAllowOutsideClick)
+            , focusConfirm = parseBoolean(element.dataset.caFocusConfirm);
+
+        if (allowEscape !== undefined) {
+            options.allowEscape = allowEscape;
+        }
+
+        if (allowOutsideClick !== undefined) {
+            options.allowOutsideClick = allowOutsideClick;
+        }
+
+        if (focusConfirm !== undefined) {
+            options.focusConfirm = focusConfirm;
+        }
+
         if (enabled !== undefined) {
             options.enabled = enabled;
         }
@@ -91,6 +147,7 @@
      * @property {string} title Titulo de confirmacion.
      * @property {string} content Mensaje principal sin formato adicional.
      * @property {string} message Mensaje final mostrado al usuario.
+    * @property {'confirm'|'cancel'|'deny'} decision Resultado final de la confirmacion.
      * @property {Event} originalEvent Evento original que disparo la confirmacion.
      */
 
@@ -100,10 +157,22 @@
      * @property {string} [title=''] Titulo opcional del prompt.
      * @property {boolean} [enabled=true] Activa o desactiva la confirmacion.
      * @property {string} [dialogSelector=''] Selector CSS de contenedor/dialog custom.
-     * @property {(detail: ConfirmActionDetail, element: HTMLElement) => (boolean|Promise<boolean>)} [confirmAdapter] Adapter custom sync/async para resolver confirmacion.
+    * @property {(detail: ConfirmActionDetail, element: HTMLElement) => (boolean|'confirm'|'cancel'|'deny'|Promise<boolean|'confirm'|'cancel'|'deny'>)} [confirmAdapter] Adapter custom sync/async para resolver confirmacion.
+    * @property {(detail: ConfirmActionDetail, element: HTMLElement) => (boolean|'confirm'|'cancel'|'deny'|Promise<boolean|'confirm'|'cancel'|'deny'>)} [preConfirm] Hook async previo a confirmar.
+    * @property {string} [confirmText='Confirmar'] Texto del boton confirmar.
+    * @property {string} [cancelText='Cancelar'] Texto del boton cancelar.
+    * @property {string} [denyText=''] Texto del boton deny (si existe).
+    * @property {string} [confirmClass=''] Clase CSS adicional para confirmar.
+    * @property {string} [cancelClass=''] Clase CSS adicional para cancelar.
+    * @property {string} [denyClass=''] Clase CSS adicional para deny.
+    * @property {string} [loadingClass='is-loading'] Clase aplicada mientras `preConfirm` esta en ejecucion.
+    * @property {boolean} [allowEscape=true] Permite cerrar con Escape.
+    * @property {boolean} [allowOutsideClick=true] Permite cerrar haciendo click fuera del dialog custom.
+    * @property {boolean} [focusConfirm=true] Enfoca el boton confirmar al abrir dialog custom.
      * @property {(detail: ConfirmActionDetail, element: HTMLElement) => void} [beforeConfirm] Hook previo a la confirmacion.
      * @property {(detail: ConfirmActionDetail, element: HTMLElement) => void} [onConfirm] Hook cuando el usuario confirma.
      * @property {(detail: ConfirmActionDetail, element: HTMLElement) => void} [onCancel] Hook cuando el usuario cancela.
+    * @property {(detail: ConfirmActionDetail, element: HTMLElement) => void} [onDeny] Hook cuando el usuario selecciona deny.
      */
 
     /**
@@ -159,15 +228,22 @@
          * @param {Event} originalEvent
          * @returns {ConfirmActionDetail}
          */
-        buildDetail(actionType, originalEvent) {
+        buildDetail(actionType, originalEvent, decision = 'cancel') {
             return {
                 element: this.subject,
                 actionType,
                 title: this.getTitleText(),
                 content: this.getMessageText(),
                 message: this.buildPromptMessage(),
+                decision,
                 originalEvent,
             };
+        }
+
+        normalizeDecision(value) {
+            if (value === true || value === 'confirm') return 'confirm';
+            if (value === 'deny') return 'deny';
+            return 'cancel';
         }
 
         /**
@@ -213,6 +289,51 @@
             }));
         }
 
+        dispatchDenied(detail) {
+            this.options.onDeny && this.options.onDeny(detail, this.subject);
+            this.subject.dispatchEvent(new CustomEvent('denied.plugin.confirmAction', {
+                detail,
+            }));
+        }
+
+        applyButtonClass(button, className) {
+            if (!(button instanceof HTMLElement)) return;
+            if (!className || typeof className !== 'string') return;
+            className.trim().split(/\s+/).filter(Boolean).forEach((token) => {
+                button.classList.add(token);
+            });
+        }
+
+        async runPreConfirm(detail, loadingTarget) {
+            if (typeof this.options.preConfirm !== 'function') return 'confirm';
+
+            const loadingClass = typeof this.options.loadingClass === 'string' && this.options.loadingClass.trim()
+                ? this.options.loadingClass.trim()
+                : CONFIRM_ACTION_DEFAULTS.loadingClass;
+
+            if (loadingTarget instanceof HTMLElement) {
+                loadingTarget.classList.add(loadingClass);
+                if ('disabled' in loadingTarget) {
+                    loadingTarget.disabled = true;
+                }
+            }
+
+            try {
+                const result = this.options.preConfirm(detail, this.subject)
+                    , resolved = result instanceof Promise ? await result : result;
+                return this.normalizeDecision(resolved === undefined ? true : resolved);
+            } catch (_error) {
+                return 'cancel';
+            } finally {
+                if (loadingTarget instanceof HTMLElement) {
+                    loadingTarget.classList.remove(loadingClass);
+                    if ('disabled' in loadingTarget) {
+                        loadingTarget.disabled = false;
+                    }
+                }
+            }
+        }
+
         /**
          * @param {ConfirmActionDetail} detail
          * @returns {Promise<boolean|null>}
@@ -223,7 +344,7 @@
             const result = this.options.confirmAdapter(detail, this.subject)
                 , resolved = result instanceof Promise ? await result : result;
 
-            return resolved === true;
+            return this.normalizeDecision(resolved);
         }
 
         /**
@@ -250,11 +371,28 @@
 
             const confirmButton = dialog.querySelector('[data-ca-confirm]')
                 , cancelButton = dialog.querySelector('[data-ca-cancel]')
+                , denyButton = dialog.querySelector('[data-ca-deny]')
                 , titleTarget = dialog.querySelector('[data-ca-dialog-title]')
                 , messageTarget = dialog.querySelector('[data-ca-dialog-message]');
 
             if (!(confirmButton instanceof HTMLElement) || !(cancelButton instanceof HTMLElement)) {
                 return null;
+            }
+
+            confirmButton.textContent = String(this.options.confirmText || CONFIRM_ACTION_DEFAULTS.confirmText);
+            cancelButton.textContent = String(this.options.cancelText || CONFIRM_ACTION_DEFAULTS.cancelText);
+            this.applyButtonClass(confirmButton, this.options.confirmClass);
+            this.applyButtonClass(cancelButton, this.options.cancelClass);
+
+            const denyText = String(this.options.denyText || '').trim();
+            if (denyButton instanceof HTMLElement) {
+                if (denyText) {
+                    denyButton.textContent = denyText;
+                    denyButton.removeAttribute('hidden');
+                    this.applyButtonClass(denyButton, this.options.denyClass);
+                } else {
+                    denyButton.setAttribute('hidden', '');
+                }
             }
 
             if (titleTarget) {
@@ -267,12 +405,19 @@
 
             return new Promise((resolve) => {
                 let isDone = false;
+                let isProcessing = false;
                 const wasHidden = dialog.hasAttribute('hidden')
                     , isNativeDialog = dialog instanceof HTMLDialogElement;
+
+                const allowEscape = this.options.allowEscape !== false
+                    , allowOutsideClick = this.options.allowOutsideClick !== false;
 
                 const cleanup = () => {
                     confirmButton.removeEventListener('click', onConfirm);
                     cancelButton.removeEventListener('click', onCancel);
+                    if (denyButton instanceof HTMLElement) {
+                        denyButton.removeEventListener('click', onDeny);
+                    }
 
                     if (isNativeDialog) {
                         dialog.removeEventListener('cancel', onDialogCancel);
@@ -282,6 +427,7 @@
                         }
                     } else {
                         dialog.removeEventListener('keydown', onKeyDown);
+                        dialog.removeEventListener('click', onOutsideClick);
                         dialog.classList.remove('is-open');
                         if (wasHidden) {
                             dialog.setAttribute('hidden', '');
@@ -293,14 +439,29 @@
                     if (isDone) return;
                     isDone = true;
                     cleanup();
-                    resolve(value === true);
+                    resolve(this.normalizeDecision(value));
                 };
 
-                const onConfirm = () => done(true)
+                const onConfirm = async () => {
+                    if (isProcessing) return;
+                    isProcessing = true;
+
+                    const preDecision = await this.runPreConfirm({ ...detail, decision: 'confirm' }, confirmButton);
+                    isProcessing = false;
+
+                    if (preDecision === 'confirm') {
+                        done('confirm');
+                    } else if (preDecision === 'deny') {
+                        done('deny');
+                    }
+                }
                     , onCancel = () => done(false)
+                    , onDeny = () => done('deny')
                     , onDialogCancel = (evt) => {
                         evt.preventDefault();
-                        done(false);
+                        if (allowEscape) {
+                            done(false);
+                        }
                     }
                     , onDialogClose = () => {
                         done(false);
@@ -308,12 +469,23 @@
                     , onKeyDown = (evt) => {
                         if (evt.key === 'Escape') {
                             evt.preventDefault();
+                            if (allowEscape) {
+                                done(false);
+                            }
+                        }
+                    }
+                    , onOutsideClick = (evt) => {
+                        if (!allowOutsideClick) return;
+                        if (evt.target === dialog) {
                             done(false);
                         }
                     };
 
                 confirmButton.addEventListener('click', onConfirm);
                 cancelButton.addEventListener('click', onCancel);
+                if (denyButton instanceof HTMLElement && denyText) {
+                    denyButton.addEventListener('click', onDeny);
+                }
 
                 if (isNativeDialog) {
                     dialog.addEventListener('cancel', onDialogCancel);
@@ -321,10 +493,17 @@
                     if (!dialog.open) {
                         dialog.showModal();
                     }
+                    if (this.options.focusConfirm !== false) {
+                        confirmButton.focus();
+                    }
                 } else {
                     dialog.removeAttribute('hidden');
                     dialog.classList.add('is-open');
                     dialog.addEventListener('keydown', onKeyDown);
+                    dialog.addEventListener('click', onOutsideClick);
+                    if (this.options.focusConfirm !== false) {
+                        confirmButton.focus();
+                    }
                 }
             });
         }
@@ -344,7 +523,12 @@
                 // Fallback seguro a confirm nativo cuando un adapter/dialog custom falla.
             }
 
-            return window.confirm(detail.message);
+            const nativeDecision = this.normalizeDecision(window.confirm(detail.message))
+                , preDecision = nativeDecision === 'confirm'
+                    ? await this.runPreConfirm({ ...detail, decision: 'confirm' }, null)
+                    : nativeDecision;
+
+            return preDecision === 'confirm' || preDecision === 'deny' ? preDecision : 'cancel';
         }
 
         /**
@@ -358,14 +542,21 @@
             const detail = this.buildDetail(actionType, originalEvent);
             if (!this.dispatchBefore(detail)) return false;
 
-            const confirmed = await this.resolveConfirmation(detail);
-            if (confirmed) {
-                this.dispatchConfirmed(detail);
-            } else {
-                this.dispatchCancelled(detail);
+            const decision = await this.resolveConfirmation(detail)
+                , finalDetail = { ...detail, decision };
+
+            if (decision === 'confirm') {
+                this.dispatchConfirmed(finalDetail);
+                return true;
             }
 
-            return confirmed;
+            if (decision === 'deny') {
+                this.dispatchDenied(finalDetail);
+                return false;
+            }
+
+            this.dispatchCancelled(finalDetail);
+            return false;
         }
 
         /**

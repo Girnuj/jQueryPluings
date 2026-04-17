@@ -14,6 +14,7 @@ Sin confirmacion, un click accidental puede generar perdida de datos o cambios n
 - Funciona en botones, links y formularios.
 - Permite desactivar/activar por atributo y escuchar eventos.
 - Soporta confirmacion personalizada con contenedor propio o adapter async.
+- Agrega control de UX: textos/clases de botones, Escape/outside click, `deny` y `preConfirm` async.
 
 ## Requisitos
 
@@ -62,6 +63,16 @@ Para produccion, usa `confirmAction.min.js`. Para depurar, usa `confirmAction.js
 - `data-ca-message="Texto"`: mensaje principal de confirmacion. Estado: **opcional**.
 - `data-ca-enabled="true|false"`: habilita o deshabilita la confirmacion. Estado: **opcional**.
 - `data-ca-dialog="#selector"`: contenedor/dialog personalizado para confirmar. Estado: **opcional**.
+- `data-ca-confirm-text="Texto"`: texto del boton confirmar. Estado: **opcional**.
+- `data-ca-cancel-text="Texto"`: texto del boton cancelar. Estado: **opcional**.
+- `data-ca-deny-text="Texto"`: texto del boton deny (si existe `[data-ca-deny]`). Estado: **opcional**.
+- `data-ca-confirm-class="clase"`: clase(s) extra para boton confirmar. Estado: **opcional**.
+- `data-ca-cancel-class="clase"`: clase(s) extra para boton cancelar. Estado: **opcional**.
+- `data-ca-deny-class="clase"`: clase(s) extra para boton deny. Estado: **opcional**.
+- `data-ca-loading-class="clase"`: clase aplicada durante `preConfirm`. Estado: **opcional**.
+- `data-ca-allow-escape="true|false"`: permite cerrar con Escape. Estado: **opcional**.
+- `data-ca-allow-outside-click="true|false"`: permite cerrar por click fuera del dialog custom. Estado: **opcional**.
+- `data-ca-focus-confirm="true|false"`: enfoca el boton confirmar al abrir dialog custom. Estado: **opcional**.
 
 ## API publica
 
@@ -74,6 +85,10 @@ Para produccion, usa `confirmAction.min.js`. Para depurar, usa `confirmAction.js
     message: 'Esta accion no se puede deshacer.',
     enabled: true,
     dialogSelector: '#confirmDialog',
+    preConfirm: async function () {
+      await new Promise(function (resolve) { setTimeout(resolve, 600); });
+      return true;
+    },
     confirmAdapter: function (detail) {
       return window.confirm(detail.message);
     },
@@ -105,14 +120,19 @@ El contenedor debe incluir:
 - `[data-ca-dialog-message]`: mensaje de confirmacion.
 - `[data-ca-confirm]`: boton confirmar.
 - `[data-ca-cancel]`: boton cancelar.
+- `[data-ca-deny]`: boton deny (opcional).
 
 Si no existe o falla, el plugin vuelve a `window.confirm` como fallback.
+
+`preConfirm` permite validaciones async antes de confirmar (por ejemplo, una llamada al backend).
+Si devuelve `false`, la accion no continua.
 
 ## Eventos
 
 - `before.plugin.confirmAction`: antes de mostrar confirmacion (cancelable).
 - `confirmed.plugin.confirmAction`: cuando el usuario confirma.
 - `cancelled.plugin.confirmAction`: cuando el usuario cancela.
+- `denied.plugin.confirmAction`: cuando el usuario selecciona deny.
 
 ## Casos recomendados
 

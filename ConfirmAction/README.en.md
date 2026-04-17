@@ -14,6 +14,7 @@ Without confirmation, accidental clicks can cause data loss or unwanted changes.
 - Works with buttons, links, and forms.
 - Lets you enable/disable behavior via attributes and listen to events.
 - Supports custom confirmation using your own container or async adapter.
+- Adds UX controls: custom button text/classes, Escape/outside click, `deny`, and async `preConfirm`.
 
 ## Requirements
 
@@ -62,6 +63,16 @@ For production, use `confirmAction.min.js`. For debugging, use `confirmAction.js
 - `data-ca-message="Text"`: main confirmation message. Status: **optional**.
 - `data-ca-enabled="true|false"`: enables or disables confirmation behavior. Status: **optional**.
 - `data-ca-dialog="#selector"`: custom container/dialog used for confirmation. Status: **optional**.
+- `data-ca-confirm-text="Text"`: confirm button text. Status: **optional**.
+- `data-ca-cancel-text="Text"`: cancel button text. Status: **optional**.
+- `data-ca-deny-text="Text"`: deny button text (if `[data-ca-deny]` exists). Status: **optional**.
+- `data-ca-confirm-class="class"`: extra class(es) for confirm button. Status: **optional**.
+- `data-ca-cancel-class="class"`: extra class(es) for cancel button. Status: **optional**.
+- `data-ca-deny-class="class"`: extra class(es) for deny button. Status: **optional**.
+- `data-ca-loading-class="class"`: class applied while `preConfirm` is running. Status: **optional**.
+- `data-ca-allow-escape="true|false"`: allow closing with Escape. Status: **optional**.
+- `data-ca-allow-outside-click="true|false"`: allow closing when clicking outside custom dialog. Status: **optional**.
+- `data-ca-focus-confirm="true|false"`: focus confirm button when custom dialog opens. Status: **optional**.
 
 ## Public API
 
@@ -74,6 +85,10 @@ For production, use `confirmAction.min.js`. For debugging, use `confirmAction.js
     message: 'This action cannot be undone.',
     enabled: true,
     dialogSelector: '#confirmDialog',
+    preConfirm: async function () {
+      await new Promise(function (resolve) { setTimeout(resolve, 600); });
+      return true;
+    },
     confirmAdapter: function (detail) {
       return window.confirm(detail.message);
     },
@@ -105,14 +120,19 @@ Expected nodes inside that container:
 - `[data-ca-dialog-message]`: confirmation message.
 - `[data-ca-confirm]`: confirm button.
 - `[data-ca-cancel]`: cancel button.
+- `[data-ca-deny]`: deny button (optional).
 
 If the selector is missing or fails, the plugin falls back to `window.confirm`.
+
+`preConfirm` allows async checks before the action is confirmed (for example, a backend validation).
+If it returns `false`, the action does not continue.
 
 ## Events
 
 - `before.plugin.confirmAction`: before showing confirmation (cancelable).
 - `confirmed.plugin.confirmAction`: fired when the user confirms.
 - `cancelled.plugin.confirmAction`: fired when the user cancels.
+- `denied.plugin.confirmAction`: fired when the user selects deny.
 
 ## Recommended cases
 
