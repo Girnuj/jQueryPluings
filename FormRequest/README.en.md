@@ -16,6 +16,27 @@ This plugin adds an extra layer for modern scenarios.
 - Apply loading state, lifecycle events, and concurrent request cancellation.
 - Add security and resilience controls (same-origin, CSRF, timeout, retry, GET debounce).
 
+## Integration with FormValidate and RequestState
+
+FormRequest can work together with:
+
+- `FormValidate`: validates rules before submit.
+- `RequestState`: handles visual trigger states (`idle/loading/success/error`).
+
+Reference:
+
+- In `RequestState/test-request-state.html` there is a 3-plugin integration example.
+
+Note:
+
+- While they integrate very well, `FormRequest`, `FormValidate`, and `RequestState` also work fully independently.
+
+Recommended pattern:
+
+- `FormValidate` decides whether submit is allowed.
+- `FormRequest` is the single owner of the real `fetch` request.
+- `RequestState` is used for visual UX and interaction blocking, without duplicating requests.
+
 ## Requirements
 
 - Modern browser with support for `fetch`, `FormData`, `CustomEvent`, `AbortController`, and `MutationObserver`.

@@ -144,3 +144,24 @@ Metodos principales:
 ## Demo
 
 - `test-form-request.html`
+
+## Integracion con FormValidate y RequestState
+
+FormRequest puede funcionar en conjunto con:
+
+- `FormValidate`: valida reglas antes del envio.
+- `RequestState`: gestiona estados visuales (`idle/loading/success/error`) del trigger.
+
+Referencia:
+
+- En `RequestState/test-request-state.html` hay un ejemplo de integracion de los 3 plugins.
+
+Nota:
+
+- Aunque se integran muy bien, `FormRequest`, `FormValidate` y `RequestState` tambien funcionan de forma totalmente independiente.
+
+Patron recomendado:
+
+- `FormValidate` decide si se permite el submit.
+- `FormRequest` es el unico responsable del envio real por `fetch`.
+- `RequestState` se usa para UX visual y bloqueo de interaccion, sin duplicar el request.
