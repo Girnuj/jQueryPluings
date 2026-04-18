@@ -4,6 +4,7 @@
 
 FormValidate agrega validaciones extendidas por `data-*` para formularios.
 No reemplaza la validacion HTML nativa: la complementa con reglas de negocio que normalmente no existen en atributos estandar.
+Ademas de las reglas incluidas por defecto, permite crear y registrar reglas personalizadas (custom) para casos especificos del proyecto.
 
 ## Que viene a solucionar
 
@@ -12,6 +13,7 @@ Cuando un formulario necesita reglas como comparar dos campos, volver obligatori
 ## Beneficios
 
 - Permite reglas de negocio declarativas solo con `data-*`.
+- Permite extender el motor con reglas custom propias, ademas de las validaciones incorporadas.
 - Convive con FormRequest y bloquea envio cuando hay errores.
 - Muestra mensajes por campo y resumen global configurable.
 - Incluye auto-init y API publica para control manual.
@@ -58,6 +60,7 @@ Estas reglas no duplican atributos nativos como `required`, `minlength` o `patte
 - `data-fv-max-files="1"`: limite de archivos seleccionados en input file.
 - `data-fv-file-max-mb="2"`: tamano maximo por archivo en MB.
 - `data-fv-file-types="image/jpeg,image/png,.pdf"`: tipos/extensiones permitidos.
+- `data-fv-custom="nombreReglaA,nombreReglaB"`: ejecuta reglas custom registradas por API.
 
 ## Mensajes
 
@@ -71,6 +74,8 @@ Estas reglas no duplican atributos nativos como `required`, `minlength` o `patte
 - `data-fv-message-max-files="..."`
 - `data-fv-message-file-max-mb="..."`
 - `data-fv-message-file-types="..."`
+- `data-fv-message-custom="..."`: mensaje generico para reglas custom.
+- `data-fv-message-custom-nombre-regla="..."`: mensaje especifico por regla custom.
 - `data-fv-message-target="#selector"`: renderiza mensaje en un elemento especifico.
 
 Tambien puedes usar un target por clave de campo con `data-fv-message-for="nameOId"`.
@@ -237,6 +242,43 @@ Metodos principales:
 - `window.FormValidate.destroy(element)`: destruye una instancia concreta.
 - `window.FormValidate.initAll(root)`: inicializa formularios compatibles en un contenedor.
 - `window.FormValidate.destroyAll(root)`: destruye instancias en un contenedor.
+- `window.FormValidate.registerCustomRule(name, validator)`: registra una regla custom global.
+- `window.FormValidate.getCustomRule(name)`: obtiene una regla custom global.
+- `window.FormValidate.hasCustomRule(name)`: valida si una regla custom existe.
+- `window.FormValidate.unregisterCustomRule(name)`: elimina una regla custom global.
+- `window.FormValidate.listCustomRules()`: lista nombres de reglas custom registradas.
+
+### Reglas custom (API)
+
+Puedes registrar reglas custom globales y usarlas en cualquier campo con `data-fv-custom`.
+
+```html
+<input
+  id="username"
+  name="username"
+  type="text"
+  data-fv-custom="username-safe"
+  data-fv-message-custom-username-safe="Solo letras, numeros, punto y guion bajo."
+/>
+
+<script>
+  window.FormValidate.registerCustomRule('username-safe', function (ctx) {
+    var value = String(ctx.value || '').trim();
+    if (!value) return true;
+    return /^[a-zA-Z0-9._]+$/.test(value);
+  });
+</script>
+```
+
+Firma recomendada del validator custom:
+
+- Entrada: `{ field, form, value, normalizeFieldValue, hasMeaningfulValue, resolveReferenceField, splitCsv, parseBoolean, parseNumber }`
+- Retornos validos:
+  - `true | undefined | null`: valido.
+  - `false`: invalido con mensaje por atributo o default.
+  - `string`: invalido usando ese mensaje.
+  - `{ valid: false, message?: string, detail?: object }`: invalido estructurado.
+  - `{ valid: true }`: valido explicito.
 
 ## Eventos
 

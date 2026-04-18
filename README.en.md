@@ -27,7 +27,7 @@ ECMAScript 2020 is supported by most modern browsers.
 - [ConfirmAction](ConfirmAction/): asks for confirmation before sensitive or destructive actions on buttons, links, and forms.
 - [FormDraft](FormDraft/): saves and restores form drafts in `localStorage`/`sessionStorage`, ideal for long form flows.
 - [FormRequest](FormRequest/): extends native forms with async `fetch` submission, field error handling, security controls, and retry/timeout behavior.
-- [FormValidate](FormValidate/): adds extended `data-*` business-rule validations and blocks submit when rules fail.
+- [FormValidate](FormValidate/): adds extended `data-*` business-rule validations, supports creating new custom rules, and blocks submit when rules fail.
 - [ImgUploadPreview](ImgUploadPreview/): previews selected image files in an `<img>` element.
 - [InfinitePager](InfinitePager/): handles incremental pagination with "load more" or infinite scroll using `fetch`.
 - [InputSwitchFriendly](InputSwitchFriendly/): displays friendly labels based on a switch/checkbox state.

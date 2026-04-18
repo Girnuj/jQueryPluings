@@ -10,7 +10,8 @@
 
     const SELECTOR_SUBJECT = 'form[data-form-validate]'
         , INSTANCES = new WeakMap()
-        , PENDING_REMOVALS = new Set();
+        , PENDING_REMOVALS = new Set()
+        , CUSTOM_RULES = new Map();
 
     const FORM_VALIDATE_DEFAULTS = Object.freeze({
         invalidClass: 'is-invalid',
@@ -19,6 +20,7 @@
         focusFirstInvalid: true,
         validateOnInput: true,
         validateOnBlur: true,
+        customRules: null,
         beforeValidate: function () { },
         afterValidate: function () { },
     });
@@ -58,6 +60,14 @@
             .split(/\s+/)
             .map((item) => item.trim())
             .filter(Boolean);
+    };
+
+    const toKebabCase = (value) => {
+        return String(value || '')
+            .replace(/([a-z0-9])([A-Z])/g, '$1-$2')
+            .replace(/[_\s]+/g, '-')
+            .toLowerCase()
+            .trim();
     };
 
     const getSubjects = (root = document) => {
@@ -140,7 +150,8 @@
             || field.hasAttribute('data-fv-min-checked')
             || field.hasAttribute('data-fv-max-files')
             || field.hasAttribute('data-fv-file-max-mb')
-            || field.hasAttribute('data-fv-file-types');
+            || field.hasAttribute('data-fv-file-types')
+            || field.hasAttribute('data-fv-custom');
     };
 
     const normalizeFieldValue = (field) => {
@@ -236,6 +247,7 @@
      * @property {boolean} [focusFirstInvalid=true] Enfoca el primer campo invalido en submit.
      * @property {boolean} [validateOnInput=true] Revalida durante eventos input.
      * @property {boolean} [validateOnBlur=true] Revalida durante eventos blur.
+    * @property {Object<string, Function>|null} [customRules=null] Reglas custom por instancia ({ nombreRegla: fn }).
      * @property {(form: HTMLFormElement) => void} [beforeValidate] Hook antes de validar.
      * @property {(errors: ValidationError[], form: HTMLFormElement) => void} [afterValidate] Hook despues de validar.
      */
@@ -510,6 +522,117 @@
         }
 
         /**
+         * Obtiene una regla custom por nombre, priorizando opciones de instancia.
+         * @param {string} ruleName Nombre de regla.
+         * @returns {Function|null}
+         */
+        getCustomRule(ruleName) {
+            const localRules = this.options.customRules;
+
+            if (localRules && typeof localRules === 'object' && typeof localRules[ruleName] === 'function') {
+                return localRules[ruleName];
+            }
+
+            return FormValidate.getCustomRule(ruleName);
+        }
+
+        /**
+         * Resuelve mensaje final para una regla custom.
+         * @param {HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement} field Campo evaluado.
+         * @param {string} ruleName Nombre de regla custom.
+         * @returns {string}
+         */
+        resolveCustomMessage(field, ruleName) {
+            const specificAttr = 'data-fv-message-custom-' + toKebabCase(ruleName)
+                , specific = field.getAttribute(specificAttr)
+                , generic = field.dataset.fvMessageCustom;
+
+            if (specific && specific.trim()) return specific.trim();
+            if (generic && generic.trim()) return generic.trim();
+            return 'Este campo no cumple la validacion personalizada.';
+        }
+
+        /**
+         * Ejecuta reglas personalizadas declaradas en `data-fv-custom`.
+         * @param {HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement} field Campo evaluado.
+         * @returns {{valid: true} | {valid: false, rule: string, message: string, detail: Object}}
+         */
+        validateCustomRules(field) {
+            const customRuleNames = splitCsv(field.dataset.fvCustom);
+            if (customRuleNames.length === 0) return { valid: true };
+
+            for (let index = 0; index < customRuleNames.length; index += 1) {
+                const ruleName = customRuleNames[index]
+                    , customRule = this.getCustomRule(ruleName);
+
+                if (typeof customRule !== 'function') continue;
+
+                const context = {
+                    field,
+                    form: this.subject,
+                    value: field.value,
+                    normalizeFieldValue: normalizeFieldValue,
+                    hasMeaningfulValue: hasMeaningfulValue,
+                    resolveReferenceField: (selector) => resolveReferenceField(this.subject, selector),
+                    splitCsv: splitCsv,
+                    parseBoolean: parseBoolean,
+                    parseNumber: parseNumber,
+                };
+
+                let output;
+                try {
+                    output = customRule(context);
+                } catch (_error) {
+                    return {
+                        valid: false,
+                        rule: 'custom:' + ruleName,
+                        message: this.resolveCustomMessage(field, ruleName),
+                        detail: {},
+                    };
+                }
+
+                if (output === true || output === undefined || output === null) {
+                    continue;
+                }
+
+                if (output === false) {
+                    return {
+                        valid: false,
+                        rule: 'custom:' + ruleName,
+                        message: this.resolveCustomMessage(field, ruleName),
+                        detail: {},
+                    };
+                }
+
+                if (typeof output === 'string') {
+                    return {
+                        valid: false,
+                        rule: 'custom:' + ruleName,
+                        message: output.trim() || this.resolveCustomMessage(field, ruleName),
+                        detail: {},
+                    };
+                }
+
+                if (output && typeof output === 'object') {
+                    if (output.valid === false) {
+                        return {
+                            valid: false,
+                            rule: 'custom:' + ruleName,
+                            message: String(output.message || this.resolveCustomMessage(field, ruleName)).trim(),
+                            detail: output.detail && typeof output.detail === 'object' ? output.detail : {},
+                        };
+                    }
+
+                    if (output.valid === true) {
+                        continue;
+                    }
+                }
+            }
+
+            return { valid: true };
+        }
+
+        /**
          * Valida regla condicional required-if.
          * @param {HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement} field Campo evaluado.
          * @returns {{valid: true} | {valid: false, rule: 'requiredIf', detail: Object}}
@@ -718,12 +841,17 @@
                 () => this.validateNoWhitespace(field),
                 () => this.validateMinChecked(field),
                 () => this.validateFileRules(field),
+                () => this.validateCustomRules(field),
             ];
 
             for (let index = 0; index < validators.length; index += 1) {
                 const result = validators[index]();
                 if (!result.valid) {
-                    const message = this.resolveMessage(field, result.rule, result.detail || {});
+                    const isCustomRule = String(result.rule || '').startsWith('custom:')
+                        , message = result.message
+                            || (isCustomRule
+                                ? this.resolveCustomMessage(field, String(result.rule || '').slice('custom:'.length))
+                                : this.resolveMessage(field, result.rule, result.detail || {}));
                     this.markInvalid(field, message);
                     return {
                         valid: false,
@@ -1027,6 +1155,66 @@
          */
         static destroyAll(root = document) {
             getSubjects(root).forEach((subject) => FormValidate.destroy(subject));
+        }
+
+        /**
+         * Registra una regla custom global reutilizable por cualquier instancia.
+         * @param {string} ruleName Nombre de la regla (usar en `data-fv-custom`).
+         * @param {Function} validator Funcion de validacion custom.
+         * @returns {void}
+         */
+        static registerCustomRule(ruleName, validator) {
+            const normalizedName = String(ruleName || '').trim();
+            if (!normalizedName) {
+                throw new Error('Error: registerCustomRule requiere un nombre de regla valido.');
+            }
+
+            if (typeof validator !== 'function') {
+                throw new Error('Error: registerCustomRule requiere una funcion validator.');
+            }
+
+            CUSTOM_RULES.set(normalizedName, validator);
+        }
+
+        /**
+         * Obtiene una regla custom global por nombre.
+         * @param {string} ruleName Nombre de la regla.
+         * @returns {Function|null}
+         */
+        static getCustomRule(ruleName) {
+            const normalizedName = String(ruleName || '').trim();
+            if (!normalizedName) return null;
+            return CUSTOM_RULES.get(normalizedName) || null;
+        }
+
+        /**
+         * Verifica si existe una regla custom global registrada.
+         * @param {string} ruleName Nombre de la regla.
+         * @returns {boolean}
+         */
+        static hasCustomRule(ruleName) {
+            const normalizedName = String(ruleName || '').trim();
+            if (!normalizedName) return false;
+            return CUSTOM_RULES.has(normalizedName);
+        }
+
+        /**
+         * Elimina una regla custom global registrada.
+         * @param {string} ruleName Nombre de la regla.
+         * @returns {boolean} `true` cuando elimina una regla existente.
+         */
+        static unregisterCustomRule(ruleName) {
+            const normalizedName = String(ruleName || '').trim();
+            if (!normalizedName) return false;
+            return CUSTOM_RULES.delete(normalizedName);
+        }
+
+        /**
+         * Lista los nombres de reglas custom globales registradas.
+         * @returns {string[]}
+         */
+        static listCustomRules() {
+            return Array.from(CUSTOM_RULES.keys());
         }
     }
 

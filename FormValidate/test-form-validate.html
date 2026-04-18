@@ -210,8 +210,8 @@
                            name="passwordConfirm"
                            type="password"
                            data-fv-equals="#password"
-                              data-fv-invalid-class="u-invalid-red"
-                              data-fv-valid-class="u-valid-green"
+                           data-fv-invalid-class="u-invalid-red"
+                           data-fv-valid-class="u-valid-green"
                            data-fv-message-equals="La confirmacion no coincide con el password." />
                     <div class="field-error" data-fv-message-for="passwordConfirm"></div>
                 </div>
@@ -224,8 +224,8 @@
                            data-fv-max-files="1"
                            data-fv-file-max-mb="1"
                            data-fv-file-types="image/jpeg,image/png"
-                              data-fv-invalid-class="u-invalid-red"
-                              data-fv-valid-class="u-valid-green"
+                           data-fv-invalid-class="u-invalid-red"
+                           data-fv-valid-class="u-valid-green"
                            data-fv-message-file-types="Solo JPG o PNG." />
                     <div class="field-error" data-fv-message-for="avatar"></div>
                 </div>
@@ -287,6 +287,20 @@
                 </div>
             </div>
 
+            <div class="row">
+                <label for="promoCode">Codigo promocional (validacion custom)</label>
+                <input id="promoCode"
+                       name="promoCode"
+                       type="text"
+                       placeholder="Ej: DEV-2026"
+                       data-fv-custom="promo-code-format,promo-no-admin"
+                       data-fv-message-custom="El codigo no cumple las reglas personalizadas."
+                       data-fv-message-custom-promo-code-format="Debe iniciar con DEV- y terminar con 4 digitos (ej: DEV-2026)."
+                       data-fv-invalid-class="u-invalid-red"
+                       data-fv-valid-class="u-valid-green" />
+                <div class="field-error" data-fv-message-for="promoCode"></div>
+            </div>
+
             <button type="submit">Validar formulario simple</button>
         </form>
 
@@ -307,6 +321,18 @@
             function log(message) {
                 logs.textContent += message + '\n';
             }
+
+            window.FormValidate.registerCustomRule('promo-code-format', function (ctx) {
+                var value = String(ctx.value || '').trim();
+                if (!value) return true;
+                return /^DEV-\d{4}$/.test(value);
+            });
+
+            window.FormValidate.registerCustomRule('promo-no-admin', function (ctx) {
+                var value = String(ctx.value || '').trim().toLowerCase();
+                if (!value) return true;
+                return !value.includes('admin') || 'El codigo no puede contener la palabra admin.';
+            });
 
             window.fetch = function (_url, _init) {
                 return Promise.resolve(new Response(JSON.stringify({ ok: true, message: 'Demo enviada' }), {

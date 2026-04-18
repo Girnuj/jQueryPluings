@@ -4,6 +4,7 @@
 
 FormValidate adds extended form validation rules through `data-*` attributes.
 It does not replace native HTML validation: it complements it with business rules that standard attributes usually do not cover.
+In addition to built-in rules, it also allows creating and registering custom validation rules for project-specific needs.
 
 ## Problem it solves
 
@@ -12,6 +13,7 @@ When a form needs rules like matching two fields, making one field required only
 ## Benefits
 
 - Declarative business rules with `data-*` attributes.
+- Extensible validation engine with custom rules beyond the built-in ones.
 - Works together with FormRequest and blocks submit when invalid.
 - Field-level messages plus optional global summary.
 - Auto-init and public API for manual control.
@@ -58,6 +60,7 @@ These rules avoid duplicating native attributes such as `required`, `minlength`,
 - `data-fv-max-files="1"`: max selected files in a file input.
 - `data-fv-file-max-mb="2"`: max file size per file in MB.
 - `data-fv-file-types="image/jpeg,image/png,.pdf"`: allowed mime types/extensions.
+- `data-fv-custom="ruleNameA,ruleNameB"`: runs custom rules registered via API.
 
 ## Messages
 
@@ -71,6 +74,8 @@ These rules avoid duplicating native attributes such as `required`, `minlength`,
 - `data-fv-message-max-files="..."`
 - `data-fv-message-file-max-mb="..."`
 - `data-fv-message-file-types="..."`
+- `data-fv-message-custom="..."`: generic message for custom rules.
+- `data-fv-message-custom-rule-name="..."`: rule-specific message for a custom rule.
 - `data-fv-message-target="#selector"`: render message in a specific element.
 
 You can also target by field key using `data-fv-message-for="nameOrId"`.
@@ -266,6 +271,43 @@ Main methods:
 - `window.FormValidate.destroy(element)`: destroys a specific instance.
 - `window.FormValidate.initAll(root)`: initializes compatible forms in a container.
 - `window.FormValidate.destroyAll(root)`: destroys instances in a container.
+- `window.FormValidate.registerCustomRule(name, validator)`: registers a global custom rule.
+- `window.FormValidate.getCustomRule(name)`: gets a global custom rule.
+- `window.FormValidate.hasCustomRule(name)`: checks if a custom rule exists.
+- `window.FormValidate.unregisterCustomRule(name)`: removes a global custom rule.
+- `window.FormValidate.listCustomRules()`: lists registered custom rule names.
+
+### Custom rules (API)
+
+You can register global custom rules and reference them in fields via `data-fv-custom`.
+
+```html
+<input
+  id="username"
+  name="username"
+  type="text"
+  data-fv-custom="username-safe"
+  data-fv-message-custom-username-safe="Only letters, numbers, dot and underscore."
+/>
+
+<script>
+  window.FormValidate.registerCustomRule('username-safe', function (ctx) {
+    var value = String(ctx.value || '').trim();
+    if (!value) return true;
+    return /^[a-zA-Z0-9._]+$/.test(value);
+  });
+</script>
+```
+
+Recommended validator signature:
+
+- Input: `{ field, form, value, normalizeFieldValue, hasMeaningfulValue, resolveReferenceField, splitCsv, parseBoolean, parseNumber }`
+- Valid return values:
+  - `true | undefined | null`: valid.
+  - `false`: invalid with attribute/default message.
+  - `string`: invalid using that message.
+  - `{ valid: false, message?: string, detail?: object }`: structured invalid.
+  - `{ valid: true }`: explicit valid.
 
 ## Events
 
