@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="es">
 <head>
   <meta charset="utf-8" />
@@ -17,38 +17,6 @@
     }
 
     * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      padding: 24px;
-      background: linear-gradient(160deg, #f8f6f1, #f1e8d5);
-      color: var(--ink);
-      font-family: "Segoe UI", Tahoma, sans-serif;
-    }
-
-    .layout {
-      max-width: 980px;
-      margin: 0 auto;
-      display: grid;
-      gap: 16px;
-    }
-
-    .panel {
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      padding: 14px;
-      box-shadow: 0 10px 24px rgba(31, 41, 55, 0.08);
-      display: grid;
-      gap: 10px;
-    }
-
-    .toolbar {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
     button {
       border: 1px solid transparent;
       background: var(--brand);
@@ -58,13 +26,6 @@
       cursor: pointer;
       font-weight: 600;
     }
-
-    .ghost {
-      background: #fff;
-      color: #334155;
-      border-color: #d1d5db;
-    }
-
     .component-card {
       border: 1px solid #d8c9a5;
       border-radius: 12px;
@@ -117,24 +78,6 @@
     .u-fade {
       opacity: 0.92;
     }
-
-    .pill {
-      display: inline-block;
-      border-radius: 999px;
-      padding: 4px 8px;
-      font-size: 12px;
-      background: #f1f5f9;
-      color: #334155;
-    }
-
-    .log {
-      margin: 0;
-      padding: 0;
-      list-style: none;
-      display: grid;
-      gap: 8px;
-    }
-
     .log li {
       border: 1px solid #dbe3ec;
       border-radius: 8px;
@@ -143,27 +86,6 @@
       color: #334155;
       font-size: 14px;
     }
-
-    .designer-panel {
-      position: fixed;
-      right: 16px;
-      bottom: 16px;
-      width: min(320px, calc(100vw - 32px));
-      border: 1px solid #d9c7a2;
-      border-radius: 12px;
-      background: #fffdf8;
-      box-shadow: 0 14px 30px rgba(31, 41, 55, 0.16);
-      padding: 12px;
-      z-index: 1000;
-      display: grid;
-      gap: 8px;
-    }
-
-    .designer-grid {
-      display: grid;
-      gap: 8px;
-    }
-
     .designer-grid label {
       font-size: 13px;
       color: #374151;
@@ -175,25 +97,15 @@
       width: 100%;
       background: #fff;
     }
-
-    .designer-actions {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
     .designer-actions button {
       flex: 1 1 auto;
       min-width: 120px;
     }
 
     @media (max-width: 800px) {
-      .designer-panel {
-        position: static;
-        width: 100%;
-      }
     }
   </style>
+  <link rel="stylesheet" href="../TestPluginCommon/test-plugin-common.css" />
 </head>
 <body data-pp-observe-root-ui-state>
   <main class="layout">
@@ -336,3 +248,7 @@
   </script>
 </body>
 </html>
+
+
+
+

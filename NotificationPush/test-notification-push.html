@@ -1,47 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>NotificationPush Demo</title>
     <style>
-        body {
-            margin: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f4f7fb;
-            color: #1d2a3b;
-            padding: 1.2rem;
-        }
-
-        .layout {
-            max-width: 1080px;
-            margin: 0 auto;
-            display: grid;
-            gap: 1rem;
-            grid-template-columns: 2fr 1fr;
-        }
-
-        .panel {
-            background: #ffffff;
-            border: 1px solid #dfe7f2;
-            border-radius: 12px;
-            padding: 1rem;
-            box-shadow: 0 10px 22px rgba(20, 34, 58, 0.08);
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 0.9rem;
-        }
-
-        .card {
-            border: 1px solid #d9e3f3;
-            border-radius: 10px;
-            padding: 0.8rem;
-            background: #fbfdff;
-        }
-
         .card h3 {
             margin: 0 0 0.35rem;
             font-size: 1rem;
@@ -52,63 +15,11 @@
             color: #334155;
             font-weight: 700;
         }
-
-        .btn {
-            border: 0;
-            background: #115ad2;
-            color: #fff;
-            border-radius: 8px;
-            padding: 0.55rem 0.8rem;
-            cursor: pointer;
-            font-weight: 600;
-            width: 100%;
-        }
-
-        .receiver {
-            font-family: Consolas, monospace;
-            font-size: 0.83rem;
-            white-space: pre-wrap;
-            min-height: 120px;
-            border: 1px dashed #c9d6ea;
-            border-radius: 8px;
-            padding: 0.6rem;
-            background: #f8fbff;
-        }
-
-        .field-list {
-            display: grid;
-            gap: 0.35rem;
-            margin-bottom: 0.8rem;
-        }
-
         .field-list span {
             display: grid;
             grid-template-columns: 86px 1fr;
             gap: 0.35rem;
         }
-
-        .logs {
-            margin-top: 0.8rem;
-            background: #0f2746;
-            color: #cae5ff;
-            border-radius: 8px;
-            min-height: 110px;
-            padding: 0.65rem;
-            white-space: pre-wrap;
-            font-family: Consolas, monospace;
-            font-size: 0.78rem;
-        }
-
-        .totals {
-            margin-top: 0.8rem;
-            border: 1px solid #cfe0f8;
-            background: #eef5ff;
-            border-radius: 8px;
-            padding: 0.65rem;
-            display: grid;
-            gap: 0.35rem;
-        }
-
         .totals strong {
             color: #0a3b86;
         }
@@ -167,14 +78,9 @@
         }
 
         @media (max-width: 900px) {
-            .layout {
-                grid-template-columns: 1fr;
-            }
-            .grid {
-                grid-template-columns: 1fr;
-            }
         }
     </style>
+  <link rel="stylesheet" href="../TestPluginCommon/test-plugin-common.css" />
 </head>
 <body data-pp-observe-root-notification-push>
     <main class="layout">
@@ -383,3 +289,7 @@
     </script>
 </body>
 </html>
+
+
+
+

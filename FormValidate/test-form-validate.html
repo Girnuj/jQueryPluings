@@ -1,44 +1,13 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>FormValidate Demo</title>
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 2rem;
-            background: #f5f7fb;
-            color: #1b263b;
-        }
-
-        .card {
-            max-width: 720px;
-            margin: 0 auto;
-            background: #ffffff;
-            border: 1px solid #dbe2ef;
-            border-radius: 12px;
-            padding: 1.25rem;
-            box-shadow: 0 10px 24px rgba(25, 42, 70, 0.08);
-        }
-
         h1 {
             margin-top: 0;
         }
-
-        .row {
-            display: grid;
-            gap: 0.75rem;
-            margin-bottom: 1rem;
-        }
-
-        .inline {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 0.75rem;
-        }
-
         label {
             font-weight: 600;
             display: block;
@@ -81,16 +50,6 @@
             color: #d90429;
             margin-top: 0.2rem;
         }
-
-        .summary {
-            border: 1px solid #f7cad0;
-            background: #fff4f6;
-            color: #8d0922;
-            border-radius: 8px;
-            padding: 0.75rem;
-            margin-bottom: 0.9rem;
-        }
-
         .summary[hidden] {
             display: none;
         }
@@ -117,18 +76,6 @@
             cursor: pointer;
             font-weight: 600;
         }
-
-        .logs {
-            margin-top: 1rem;
-            background: #102a43;
-            color: #cbe6ff;
-            border-radius: 8px;
-            padding: 0.75rem;
-            min-height: 100px;
-            font-family: Consolas, monospace;
-            white-space: pre-wrap;
-        }
-
         .demo-separator {
             margin: 1.2rem 0;
             border: 0;
@@ -136,11 +83,9 @@
         }
 
         @media (max-width: 700px) {
-            .inline {
-                grid-template-columns: 1fr;
-            }
         }
     </style>
+  <link rel="stylesheet" href="../TestPluginCommon/test-plugin-common.css" />
 </head>
 <body data-pp-observe-root-form-validate>
     <main class="card">
@@ -378,3 +323,7 @@
     </script>
 </body>
 </html>
+
+
+
+

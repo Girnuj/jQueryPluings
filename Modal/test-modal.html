@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="es">
 <head>
   <meta charset="utf-8" />
@@ -19,31 +19,6 @@
     * {
       box-sizing: border-box;
     }
-
-    body {
-      margin: 0;
-      font-family: "Segoe UI", Tahoma, sans-serif;
-      background: radial-gradient(circle at top right, #e6fffa 0%, var(--bg) 55%);
-      color: var(--ink);
-      min-height: 100vh;
-      padding: 32px 18px;
-    }
-
-    .layout {
-      max-width: 900px;
-      margin: 0 auto;
-      display: grid;
-      gap: 14px;
-    }
-
-    .panel {
-      border: 1px solid var(--line);
-      background: var(--card);
-      border-radius: 12px;
-      padding: 16px;
-      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.06);
-    }
-
     h1,
     h2 {
       margin: 0 0 10px;
@@ -53,14 +28,6 @@
       margin: 0;
       color: var(--muted);
     }
-
-    .actions {
-      margin-top: 14px;
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
     button,
     a.btn-link {
       border: 1px solid transparent;
@@ -81,24 +48,6 @@
       transform: translateY(-1px);
       filter: brightness(1.03);
     }
-
-    .btn-primary {
-      background: var(--brand);
-      color: #fff;
-    }
-
-    .btn-neutral {
-      background: #f8fafc;
-      border-color: #cbd5e1;
-      color: #0f172a;
-    }
-
-    .btn-danger {
-      background: #fee2e2;
-      border-color: #fecaca;
-      color: var(--danger);
-    }
-
     .modal-shell {
       position: fixed;
       inset: 0;
@@ -149,12 +98,6 @@
       display: grid;
       gap: 12px;
     }
-
-    .field {
-      display: grid;
-      gap: 6px;
-    }
-
     label {
       font-size: 14px;
       color: #374151;
@@ -195,6 +138,7 @@
       }
     }
   </style>
+  <link rel="stylesheet" href="../TestPluginCommon/test-plugin-common.css" />
 </head>
 <body data-pp-observe-root-modal>
   <main class="layout">
@@ -205,6 +149,10 @@
       <div class="actions">
         <button class="btn-primary" type="button" data-modal="toggle" data-modal-target="#demoModal">
           Abrir modal (data-*)
+        </button>
+
+        <button class="btn-neutral" type="button" data-modal="toggle" data-modal-target="#noEscapeModal">
+          Abrir modal sin Escape
         </button>
 
         <a href="#" class="btn-link btn-neutral" data-modal="toggle" data-modal-target="#demoModal">
@@ -253,10 +201,40 @@
     </div>
   </div>
 
+  <div
+    id="noEscapeModal"
+    class="modal-shell"
+    data-role="modal"
+    data-modal-focus="true"
+    data-modal-keyboard="false"
+    data-modal-static="false"
+    aria-hidden="true">
+    <div class="modal-backdrop" data-modal="backdrop">
+      <div class="modal-card" role="document" aria-label="Modal sin cierre con Escape">
+        <header class="modal-head">
+          <strong>Modal sin cierre con Escape</strong>
+        </header>
+
+        <section class="modal-body">
+          <p>
+            Este modal ignora la tecla <strong>Escape</strong> porque usa
+            <code>data-modal-keyboard="false"</code>.
+          </p>
+          <p>Puedes cerrarlo con backdrop o con el boton dismiss.</p>
+        </section>
+
+        <footer class="modal-foot">
+          <button type="button" class="btn-danger" data-modal="dismiss">Cerrar</button>
+        </footer>
+      </div>
+    </div>
+  </div>
+
   <script src="./modal.min.js"></script>
   <script>
     // JS de esta vista: solo demuestra como usar Modal (data-attributes, API manual y eventos).
     const modalElement = document.getElementById('demoModal');
+    const noEscapeModalElement = document.getElementById('noEscapeModal');
     const logElement = document.getElementById('log');
 
     function addLog(message) {
@@ -273,6 +251,14 @@
 
     modalElement.addEventListener('hidden.plugin.modal', function () {
       addLog('hidden.plugin.modal');
+    });
+
+    noEscapeModalElement.addEventListener('shown.plugin.modal', function () {
+      addLog('shown.plugin.modal (sin Escape)');
+    });
+
+    noEscapeModalElement.addEventListener('hidden.plugin.modal', function () {
+      addLog('hidden.plugin.modal (sin Escape)');
     });
 
     document.getElementById('btnOpenApi').addEventListener('click', function () {
@@ -296,3 +282,7 @@
   </script>
 </body>
 </html>
+
+
+
+

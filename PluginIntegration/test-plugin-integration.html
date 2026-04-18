@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="es">
 <head>
   <meta charset="utf-8" />
@@ -18,44 +18,8 @@
     }
 
     * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      padding: 24px;
-      font-family: "Segoe UI", Tahoma, sans-serif;
-      color: var(--ink);
-      background:
-        radial-gradient(circle at top right, #dbeafe, transparent 35%),
-        radial-gradient(circle at top left, #dcfce7, transparent 36%),
-        var(--bg);
-    }
-
-    .layout {
-      max-width: 980px;
-      margin: 0 auto;
-      display: grid;
-      gap: 14px;
-    }
-
-    .panel {
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      padding: 14px;
-      background: var(--card);
-      box-shadow: 0 12px 30px rgba(2, 6, 23, 0.08);
-      display: grid;
-      gap: 10px;
-    }
-
     h1, h2, h3 { margin: 0; }
     p { margin: 0; color: var(--muted); }
-
-    .row {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
     button {
       border: 1px solid transparent;
       border-radius: 8px;
@@ -66,28 +30,6 @@
       color: #fff;
       background: var(--brand);
     }
-
-    .btn-secondary { background: var(--brand-2); }
-    .btn-danger { background: var(--danger); }
-    .btn-warn { background: var(--warn); color: #111827; }
-
-    .state-box {
-      border: 1px dashed #94a3b8;
-      border-radius: 10px;
-      padding: 10px;
-      font-size: 14px;
-      background: #f8fafc;
-      color: #334155;
-    }
-
-    .logs {
-      margin: 0;
-      padding: 0;
-      list-style: none;
-      display: grid;
-      gap: 8px;
-    }
-
     .logs li {
       border: 1px solid #dbe3ec;
       border-radius: 8px;
@@ -146,12 +88,6 @@
       display: grid;
       gap: 10px;
     }
-
-    .field {
-      display: grid;
-      gap: 6px;
-    }
-
     label {
       font-size: 14px;
       font-weight: 600;
@@ -170,15 +106,6 @@
       font-size: 13px;
       color: #b91c1c;
     }
-
-    .summary {
-      border: 1px solid #fecaca;
-      border-radius: 8px;
-      background: #fff1f2;
-      color: #9f1239;
-      padding: 8px 10px;
-    }
-
     .summary[hidden] { display: none; }
 
     .is-invalid {
@@ -190,46 +117,9 @@
       border-color: #22c55e;
       background: #f3fff7;
     }
-
-    .is-loading {
-      opacity: 0.7;
-      pointer-events: none;
-    }
-
-    .confirm-box {
-      position: fixed;
-      inset: 0;
-      z-index: 1400;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
-      background: rgba(15, 23, 42, 0.58);
-    }
-
     .confirm-box.is-open { display: flex; }
-
-    .confirm-card {
-      width: min(440px, 100%);
-      border: 1px solid #dbe3ec;
-      border-radius: 12px;
-      background: #fff;
-      padding: 14px;
-      display: grid;
-      gap: 10px;
-    }
-
-    .confirm-actions {
-      display: flex;
-      justify-content: flex-end;
-      gap: 8px;
-    }
-
-    .ghost {
-      background: #e2e8f0;
-      color: #111827;
-    }
   </style>
+  <link rel="stylesheet" href="../TestPluginCommon/test-plugin-common.css" />
 </head>
 <body>
   <!-- Panel principal con accesos rapidos a cada flujo de integracion -->
@@ -659,3 +549,7 @@
   </script>
 </body>
 </html>
+
+
+
+

@@ -1,0 +1,212 @@
+/* Common base styles for plugin test pages */
+:root {
+  --tp-font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  --tp-bg: #f4f7fb;
+  --tp-surface: #ffffff;
+  --tp-text: #14213d;
+  --tp-muted: #51627a;
+  --tp-border: #d7e0ef;
+  --tp-shadow: 0 10px 28px rgba(10, 24, 52, 0.08);
+  --tp-radius: 12px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--tp-font-family);
+  color: var(--tp-text);
+  background: radial-gradient(circle at 0% 0%, #eaf1ff 0%, transparent 36%),
+    radial-gradient(circle at 100% 0%, #e8fff4 0%, transparent 34%),
+    var(--tp-bg);
+  line-height: 1.45;
+}
+
+main {
+  width: min(1040px, calc(100% - 2rem));
+  margin: 1rem auto;
+}
+
+h1,
+h2,
+h3 {
+  margin-top: 0;
+}
+
+p {
+  color: var(--tp-muted);
+}
+
+pre,
+code,
+kbd,
+samp {
+  font-family: Consolas, "Courier New", monospace;
+}
+
+a {
+  color: #0a67ec;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+.tp-card {
+  border: 1px solid var(--tp-border);
+  border-radius: var(--tp-radius);
+  background: var(--tp-surface);
+  box-shadow: var(--tp-shadow);
+  padding: 1rem;
+}
+
+.tp-muted {
+  color: var(--tp-muted);
+}
+
+.layout,
+.wrap {
+  width: min(1040px, calc(100% - 2rem));
+  margin: 1rem auto;
+  display: grid;
+  gap: 14px;
+}
+
+.tp-card,
+.card,
+.panel,
+.box,
+.state-box,
+.receiver,
+.result-box,
+.summary,
+.confirm-card,
+.confirm-box,
+.designer-panel {
+  border: 1px solid var(--tp-border);
+  border-radius: var(--tp-radius);
+  background: var(--tp-surface);
+  box-shadow: var(--tp-shadow);
+  padding: 1rem;
+}
+
+.muted,
+.note {
+  color: var(--tp-muted);
+}
+
+.grid,
+.row,
+.stack,
+.field,
+.field-list,
+.controls,
+.totals,
+.products,
+.list,
+.feed,
+.designer-grid,
+.form-grid {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.inline {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.actions,
+.toolbar,
+.confirm-actions,
+.designer-actions,
+.modal-foot {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.pill {
+  border: 1px solid var(--tp-border);
+  border-radius: 999px;
+  background: #f8fbff;
+  padding: 0.28rem 0.6rem;
+  font-size: 0.86rem;
+  color: #334155;
+}
+
+button,
+.btn,
+.btn-primary {
+  border: 1px solid transparent;
+  background: #0a67ec;
+  color: #fff;
+  border-radius: 8px;
+  padding: 0.6rem 0.9rem;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.ghost,
+.btn-secondary,
+.btn-neutral {
+  background: #e2e8f0;
+  color: #111827;
+  border-color: #cbd5e1;
+}
+
+.warn {
+  background: #f59e0b;
+  color: #111827;
+}
+
+.danger,
+.btn-danger {
+  background: #dc2626;
+  color: #fff;
+}
+
+.state {
+  border: 1px dashed #9fb4d8;
+  border-radius: 10px;
+  background: #f8fbff;
+  padding: 0.55rem 0.7rem;
+  color: #334155;
+}
+
+.log,
+.logs {
+  margin: 0;
+  padding: 0.65rem;
+  border-radius: 8px;
+  background: #0f223a;
+  color: #d2ecff;
+  min-height: 120px;
+  overflow: auto;
+}
+
+.is-loading,
+.demo-loading,
+.own-loading,
+.m-loading {
+  opacity: 0.65;
+  pointer-events: none;
+}
+
+@media (max-width: 760px) {
+  .inline {
+    grid-template-columns: 1fr;
+  }
+}

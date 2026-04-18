@@ -1,40 +1,10 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="es">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>FormDraft Demo</title>
   <style>
-    body {
-      margin: 0;
-      padding: 20px;
-      font-family: "Segoe UI", Tahoma, sans-serif;
-      background: #f5f7fb;
-      color: #1f2937;
-    }
-
-    .wrap {
-      max-width: 900px;
-      margin: 0 auto;
-      display: grid;
-      gap: 12px;
-    }
-
-    .panel {
-      border: 1px solid #dbe4ef;
-      border-radius: 12px;
-      padding: 14px;
-      background: #fff;
-      display: grid;
-      gap: 10px;
-    }
-
-    .grid {
-      display: grid;
-      gap: 10px;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
     label {
       display: grid;
       gap: 6px;
@@ -53,13 +23,6 @@
       min-height: 88px;
       resize: vertical;
     }
-
-    .row {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
     button {
       border: 0;
       border-radius: 8px;
@@ -70,29 +33,6 @@
       background: #0f766e;
       cursor: pointer;
     }
-
-    .ghost {
-      background: #334155;
-    }
-
-    .box {
-      border: 1px dashed #93a4bc;
-      border-radius: 10px;
-      padding: 10px;
-      background: #f8fafc;
-      font-size: 14px;
-      color: #334155;
-      white-space: pre-wrap;
-    }
-
-    .logs {
-      margin: 0;
-      padding: 0;
-      list-style: none;
-      display: grid;
-      gap: 6px;
-    }
-
     .logs li {
       border: 1px solid #e2e8f0;
       border-radius: 8px;
@@ -103,11 +43,9 @@
     }
 
     @media (max-width: 760px) {
-      .grid {
-        grid-template-columns: 1fr;
-      }
     }
   </style>
+  <link rel="stylesheet" href="../TestPluginCommon/test-plugin-common.css" />
 </head>
 <body data-pp-observe-root-form-draft data-pp-observe-root-form-request>
   <main class="wrap">
@@ -245,3 +183,7 @@
   </script>
 </body>
 </html>
+
+
+
+

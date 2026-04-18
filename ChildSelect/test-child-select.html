@@ -1,39 +1,10 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="es">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Test - ChildSelect</title>
   <style>
-    body {
-      font-family: Segoe UI, Tahoma, sans-serif;
-      margin: 24px;
-      line-height: 1.4;
-      color: #222;
-      background: #f6f8fa;
-    }
-
-    .layout {
-      max-width: 760px;
-      margin: 0 auto;
-      display: grid;
-      gap: 14px;
-    }
-
-    .panel {
-      border: 1px solid #ddd;
-      border-radius: 10px;
-      padding: 12px;
-      background: #fff;
-      display: grid;
-      gap: 10px;
-    }
-
-    .row {
-      display: grid;
-      gap: 6px;
-    }
-
     select {
       padding: 8px;
       border: 1px solid #bbb;
@@ -48,18 +19,12 @@
       background-size: 200% 100%;
       animation: pulse 0.8s linear infinite;
     }
-
-    .note {
-      margin: 0;
-      color: #555;
-      font-size: 14px;
-    }
-
     @keyframes pulse {
       0% { background-position: 100% 0; }
       100% { background-position: -100% 0; }
     }
   </style>
+  <link rel="stylesheet" href="../TestPluginCommon/test-plugin-common.css" />
 </head>
 <body data-pp-observe-root-child-select>
   <main class="layout">
@@ -186,3 +151,7 @@
   </script>
 </body>
 </html>
+
+
+
+

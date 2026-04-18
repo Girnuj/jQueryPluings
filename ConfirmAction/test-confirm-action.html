@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="es">
 <head>
   <meta charset="utf-8" />
@@ -16,47 +16,6 @@
     }
 
     * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      padding: 24px;
-      font-family: "Segoe UI", Tahoma, sans-serif;
-      color: var(--ink);
-      background: radial-gradient(circle at top right, #dbeafe, #f8fafc 50%);
-    }
-
-    .layout {
-      max-width: 960px;
-      margin: 0 auto;
-      display: grid;
-      gap: 14px;
-    }
-
-    .panel {
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      padding: 14px;
-      box-shadow: 0 10px 24px rgba(2, 6, 23, 0.08);
-      display: grid;
-      gap: 10px;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 14px;
-    }
-
-    .card {
-      border: 1px solid #dbe3ec;
-      border-radius: 10px;
-      padding: 12px;
-      display: grid;
-      gap: 10px;
-      background: #f8fafc;
-    }
-
     h1, h2, h3 {
       margin: 0;
     }
@@ -88,15 +47,6 @@
       background: var(--danger);
       color: #ffffff;
     }
-
-    .log {
-      margin: 0;
-      padding: 0;
-      list-style: none;
-      display: grid;
-      gap: 8px;
-    }
-
     .log li {
       border: 1px solid #dbe3ec;
       border-radius: 8px;
@@ -105,54 +55,11 @@
       color: #334155;
       font-size: 14px;
     }
-
-    .confirm-box {
-      position: fixed;
-      inset: 0;
-      background: rgba(15, 23, 42, 0.45);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
-      z-index: 30;
-    }
-
     .confirm-box.is-open {
       display: flex;
     }
-
-    .confirm-card {
-      width: min(420px, 100%);
-      border: 1px solid #dbe3ec;
-      border-radius: 12px;
-      background: #ffffff;
-      padding: 14px;
-      display: grid;
-      gap: 10px;
-      box-shadow: 0 14px 30px rgba(2, 6, 23, 0.2);
-    }
-
-    .confirm-actions {
-      display: flex;
-      gap: 8px;
-      justify-content: flex-end;
-    }
-
-    .ghost {
-      background: #e2e8f0;
-      color: #0f172a;
-    }
-
-    .warn {
-      background: #facc15;
-      color: #111827;
-    }
-
-    .is-loading {
-      opacity: 0.7;
-      pointer-events: none;
-    }
   </style>
+  <link rel="stylesheet" href="../TestPluginCommon/test-plugin-common.css" />
 </head>
 <body data-pp-observe-root-confirm-action>
   <main class="layout">
@@ -302,3 +209,7 @@
   </script>
 </body>
 </html>
+
+
+
+

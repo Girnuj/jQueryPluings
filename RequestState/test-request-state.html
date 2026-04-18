@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8" />
@@ -15,36 +15,6 @@
             --error: #c03737;
             --border: #d8e2f2;
         }
-
-        body {
-            margin: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: radial-gradient(circle at top left, #e9f0ff, var(--bg));
-            color: var(--text);
-            padding: 1.2rem;
-        }
-
-        .layout {
-            max-width: 1020px;
-            margin: 0 auto;
-            display: grid;
-            gap: 1rem;
-            grid-template-columns: 1.4fr 1fr;
-        }
-
-        .panel {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 1rem;
-            box-shadow: 0 12px 22px rgba(15, 23, 42, 0.08);
-        }
-
-        .stack {
-            display: grid;
-            gap: 0.8rem;
-        }
-
         .action {
             border: 1px solid var(--border);
             border-radius: 10px;
@@ -80,33 +50,6 @@
             color: #0f172a;
             background: #fff;
         }
-
-        .state-box {
-            border: 1px dashed #c9d6ea;
-            border-radius: 8px;
-            padding: 0.55rem;
-            background: #f7faff;
-            font-family: Consolas, monospace;
-            font-size: 0.82rem;
-            transition: border-color .2s ease, background .2s ease;
-        }
-
-        .btn {
-            border: 0;
-            border-radius: 8px;
-            background: #0f4bc6;
-            color: #fff;
-            padding: 0.55rem 0.85rem;
-            cursor: pointer;
-            font-weight: 600;
-            width: fit-content;
-        }
-
-        .is-loading {
-            border-color: rgba(29, 78, 216, 0.4);
-            background: rgba(29, 78, 216, 0.06);
-        }
-
         .is-success {
             border-color: rgba(31, 143, 74, 0.45);
             background: rgba(31, 143, 74, 0.08);
@@ -116,12 +59,6 @@
             border-color: rgba(192, 55, 55, 0.45);
             background: rgba(192, 55, 55, 0.08);
         }
-
-        .demo-loading {
-            border-color: rgba(125, 42, 232, 0.45);
-            background: rgba(125, 42, 232, 0.08);
-        }
-
         .demo-success {
             border-color: rgba(9, 138, 110, 0.5);
             background: rgba(9, 138, 110, 0.1);
@@ -136,12 +73,6 @@
             border-color: #9db4d8;
             background: #f6faff;
         }
-
-        .own-loading {
-            border-color: rgba(147, 51, 234, 0.45);
-            background: rgba(147, 51, 234, 0.12);
-        }
-
         .own-success {
             border-color: rgba(22, 163, 74, 0.5);
             background: rgba(22, 163, 74, 0.12);
@@ -156,24 +87,10 @@
             border-color: rgba(55, 65, 81, 0.35);
             background: rgba(243, 244, 246, 0.8);
         }
-
-        .logs {
-            min-height: 180px;
-            border-radius: 8px;
-            padding: 0.7rem;
-            background: #0f2746;
-            color: #cae5ff;
-            font-size: 0.78rem;
-            white-space: pre-wrap;
-            font-family: Consolas, monospace;
-        }
-
         @media (max-width: 900px) {
-            .layout {
-                grid-template-columns: 1fr;
-            }
         }
     </style>
+  <link rel="stylesheet" href="../TestPluginCommon/test-plugin-common.css" />
 </head>
 <body data-pp-observe-root-request-state>
     <main class="layout">
@@ -478,3 +395,7 @@
     </script>
 </body>
 </html>
+
+
+
+
