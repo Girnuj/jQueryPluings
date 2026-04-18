@@ -87,6 +87,7 @@ Para mantener buen rendimiento cuando varios plugins conviven en una misma vista
 1. Default (sin configurar nada)
    - No agregues atributos.
    - Resultado: fallback a `document.body`.
+   - Inicialización automática del plugin o los plugins.
 
 2. Root compartido por selector (SPA)
 

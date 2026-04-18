@@ -87,6 +87,7 @@ To keep strong performance when multiple plugins coexist in the same view, the r
 1. Default (no configuration)
    - Add nothing.
    - Result: fallback to `document.body`.
+   - Automatic initialization of the plugin or plugins.
 
 2. Shared root by selector (SPA)
 
