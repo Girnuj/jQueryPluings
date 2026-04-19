@@ -992,11 +992,9 @@
                 }
             }
 
-            if (hasMeaningfulValue(field)) {
-                this.markValid(field);
-            } else {
-                this.clearPresentation(field);
-            }
+            hasMeaningfulValue(field)
+               ? this.markValid(field)
+               : this.clearPresentation(field);
 
             return {
                 valid: true,
