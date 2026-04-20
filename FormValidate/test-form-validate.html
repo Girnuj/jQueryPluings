@@ -114,8 +114,8 @@
                            type="text"
                            required
                            data-fv-no-whitespace="true"
-                            data-fv-invalid-class="u-invalid-red"
-                            data-fv-valid-class="u-valid-green"
+                           data-fv-invalid-class="u-invalid-red"
+                           data-fv-valid-class="u-valid-green"
                            data-fv-message-no-whitespace="El usuario no puede tener espacios." />
                     <div class="field-error" data-fv-message-for="username"></div>
                 </div>
@@ -258,27 +258,31 @@
     <script src="./formValidate.min.js"></script>
     <script>
         (function () {
-            var logs = document.querySelector('#logs')
+            const logs = document.querySelector('#logs')
                 , form = document.querySelector('#demoForm')
                 , simpleForm = document.querySelector('#demoFormSimple')
                 , originalFetch = window.fetch;
 
+            // Función para mostrar logs en pantalla
             function log(message) {
                 logs.textContent += message + '\n';
             }
 
+            // Regla custom: el código debe iniciar con DEV- y terminar con 4 dígitos
             window.Plugins.FormValidate.registerCustomRule('promo-code-format', function (ctx) {
-                var value = String(ctx.value || '').trim();
+                const value = String(ctx.value || '').trim();
                 if (!value) return true;
                 return /^DEV-\d{4}$/.test(value);
             });
 
+            // Regla custom: el código no puede contener la palabra "admin"
             window.Plugins.FormValidate.registerCustomRule('promo-no-admin', function (ctx) {
-                var value = String(ctx.value || '').trim().toLowerCase();
+                const value = String(ctx.value || '').trim().toLowerCase();
                 if (!value) return true;
                 return !value.includes('admin') || 'El codigo no puede contener la palabra admin.';
             });
 
+            // Mock de fetch para evitar peticiones reales en el entorno demo
             window.fetch = function (_url, _init) {
                 return Promise.resolve(new Response(JSON.stringify({ ok: true, message: 'Demo enviada' }), {
                     status: 200,
@@ -286,6 +290,7 @@
                 }));
             };
 
+            // Inicializa FormRequest con callbacks de éxito y error
             window.Plugins.FormRequest.init(form, {
                 onSuccess: function (data) {
                     log('FormRequest success: ' + JSON.stringify(data));
@@ -295,6 +300,7 @@
                 }
             });
 
+            // Eventos de validación extendida en el formulario principal
             form.addEventListener('invalid.plugin.formValidate', function (evt) {
                 log('FormValidate invalid: ' + evt.detail.errors.length + ' error(es)');
             });
@@ -303,6 +309,7 @@
                 log('FormValidate valid: reglas extendidas OK');
             });
 
+            // Eventos en el formulario simple (sin FormRequest)
             simpleForm.addEventListener('submit', function (evt) {
                 evt.preventDefault();
                 log('Submit local en formulario simple (sin FormRequest).');
@@ -316,6 +323,7 @@
                 log('Simple valid: validaciones extendidas OK');
             });
 
+            // Restaurar fetch original al salir de la página
             window.addEventListener('beforeunload', function () {
                 window.fetch = originalFetch;
             });

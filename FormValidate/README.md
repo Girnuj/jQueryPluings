@@ -261,7 +261,7 @@ Puedes registrar reglas custom globales y usarlas en cualquier campo con `data-f
 
 <script>
   window.Plugins.FormValidate.registerCustomRule('username-safe', function (ctx) {
-    var value = String(ctx.value || '').trim();
+    const value = String(ctx.value || '').trim();
     if (!value) return true;
     return /^[a-zA-Z0-9._]+$/.test(value);
   });
