@@ -782,31 +782,6 @@
             getSubjects(root).forEach((subject) => ConfirmAction.destroy(subject));
         }
     }
-
-    /**
-     * Procesa nodos removidos en microtarea para destruir instancias huérfanas.
-     *
-     * @returns {void}
-     */
-    const flushPendingRemovals = () => {
-        PENDING_REMOVALS.forEach((node) => {
-            if (!node.isConnected) {
-                ConfirmAction.destroyAll(node);
-            }
-            PENDING_REMOVALS.delete(node);
-        });
-    };
-
-    /**
-     * Agenda la validacion diferida de nodos removidos.
-     *
-     * @param {Node} node Nodo removido del DOM.
-     * @returns {void}
-     */
-    const scheduleRemovalCheck = (node) => {
-        PENDING_REMOVALS.add(node);
-        queueMicrotask(flushPendingRemovals);
-    };
     
     /**
      * ObserverDispatcher avanzado: permite a cada plugin observar solo el root que le corresponde,
@@ -825,7 +800,7 @@
              */
             function resolveRoot(pluginKey) {
                 // 1. data-pp-observe-root-{plugin}
-                const attr = 'data-pp-observe-root-' + pluginKey
+                const attr = `data-pp-observe-root-${pluginKey}`
                     , specific = document.querySelector(`[${attr}]`);
                 if (specific) return specific;
 
@@ -871,6 +846,29 @@
             return { register };
         })();
     }
+    
+    /**
+     * Procesa nodos removidos en microtarea para destruir instancias huérfanas.
+     * @returns {void}
+     */
+    const flushPendingRemovals = () => {
+        PENDING_REMOVALS.forEach((node) => {
+            if (!node.isConnected) {
+                ConfirmAction.destroyAll(node);
+            }
+            PENDING_REMOVALS.delete(node);
+        });
+    };
+
+    /**
+     * Agenda la validacion diferida de nodos removidos.
+     * @param {Node} node Nodo removido del DOM.
+     * @returns {void}
+     */
+    const scheduleRemovalCheck = (node) => {
+        PENDING_REMOVALS.add(node);
+        queueMicrotask(flushPendingRemovals);
+    };
 
     /**
      * Inicializa automáticamente las instancias del plugin y observa cambios en el DOM.

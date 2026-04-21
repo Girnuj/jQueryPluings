@@ -771,29 +771,6 @@
     }
     
     /**
-     * Limpia instancias asociadas a formularios removidos del DOM.
-     * @returns {void}
-     */
-    const flushPendingRemovals = () => {
-        PENDING_REMOVALS.forEach((node) => {
-            if (!node.isConnected) {
-                FormDraft.destroyAll(node);
-            }
-            PENDING_REMOVALS.delete(node);
-        });
-    };
-
-    /**
-     * Agenda verificacion diferida de remocion de nodos.
-     * @param {Element} node Nodo removido en mutacion.
-     * @returns {void}
-     */
-    const scheduleRemovalCheck = (node) => {
-        PENDING_REMOVALS.add(node);
-        queueMicrotask(flushPendingRemovals);
-    };
-    
-    /**
      * ObserverDispatcher avanzado: permite a cada plugin observar solo el root que le corresponde,
      * evitando múltiples MutationObserver redundantes y respetando la configuración global.
      */
@@ -810,7 +787,7 @@
              */
             function resolveRoot(pluginKey) {
                 // 1. data-pp-observe-root-{plugin}
-                const attr = 'data-pp-observe-root-' + pluginKey
+                const attr = `data-pp-observe-root-${pluginKey}`
                     , specific = document.querySelector(`[${attr}]`);
                 if (specific) return specific;
 
@@ -856,6 +833,29 @@
             return { register };
         })();
     }
+
+    /**
+     * Limpia instancias asociadas a formularios removidos del DOM.
+     * @returns {void}
+     */
+    const flushPendingRemovals = () => {
+        PENDING_REMOVALS.forEach((node) => {
+            if (!node.isConnected) {
+                FormDraft.destroyAll(node);
+            }
+            PENDING_REMOVALS.delete(node);
+        });
+    };
+
+    /**
+     * Agenda verificacion diferida de remocion de nodos.
+     * @param {Element} node Nodo removido en mutacion.
+     * @returns {void}
+     */
+    const scheduleRemovalCheck = (node) => {
+        PENDING_REMOVALS.add(node);
+        queueMicrotask(flushPendingRemovals);
+    };
 
     /**
      * Inicializa automáticamente las instancias del plugin y observa cambios en el DOM.
