@@ -314,7 +314,7 @@
         queueMicrotask(flushPendingRemovals);
     };
 
-    // Handler para mutaciones DOM (alta/baja de formularios)
+    // Handler para mutaciones DOM (agregado/remoción de triggers)
     const inputSwitchFriendlyDomHandler = (mutations) => {
         mutations.forEach((mutation) => {
             mutation.addedNodes.forEach((node) => {

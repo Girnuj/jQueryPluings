@@ -938,7 +938,7 @@
         queueMicrotask(flushPendingRemovals);
     };
 
-    // Handler para mutaciones DOM (alta/baja de formularios)
+    // Handler para mutaciones DOM (agregado/remoción de triggers)
     const infinitePagerDomHandler = (mutations) => {
         mutations.forEach((mutation) => {
             mutation.addedNodes.forEach((node) => {
@@ -962,6 +962,6 @@
     document.readyState === 'loading'
         ? document.addEventListener('DOMContentLoaded', startAutoInit, { once: true })
         : startAutoInit();
-        
+
     window.Plugins.InfinitePager = InfinitePager;
 })();
