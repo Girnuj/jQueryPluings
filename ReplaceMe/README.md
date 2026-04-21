@@ -156,14 +156,15 @@ Si quieres limitar el `MutationObserver` de este plugin a un contenedor especifi
 
 Prioridad de root para el plugin:
 
-1. `
-data-pp-observe-root-replace-me
-`
+1. `data-pp-observe-root-replace-me`
 2. `data-pp-observe-root` en `<html>`
 3. `document.body`
+
+#### ℹ️ Para detalles sobre el patrón de observers y cómo optimizar la inicialización automática de plugins, revisa la sección [Patrón Recomendado De Observers](../README.md#patron-recomendado-de-observers) en el README principal.
 
 ## Licencia
 
 Este plugin se distribuye bajo la licencia MIT.
-Copyright (c) 2026 Samuel Montenegro
 Consulta el archivo LICENSE en la raíz del repositorio para los términos completos.
+
+Copyright (c) 2026 Samuel Montenegro

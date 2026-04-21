@@ -71,5 +71,6 @@ They can complement each other: for example, you can trigger a visual notificati
 ## License
 
 This plugin is distributed under the MIT license.
-Copyright (c) 2026 Samuel Montenegro
 See the LICENSE file in the repository root for full terms.
+
+Copyright (c) 2026 Samuel Montenegro

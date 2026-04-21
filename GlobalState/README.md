@@ -72,5 +72,6 @@ Ambos pueden complementarse: por ejemplo, puedes disparar una notificación visu
 ## Licencia
 
 Este plugin se distribuye bajo la licencia MIT.
-Copyright (c) 2026 Samuel Montenegro
 Consulta el archivo LICENSE en la raíz del repositorio para los términos completos.
+
+Copyright (c) 2026 Samuel Montenegro

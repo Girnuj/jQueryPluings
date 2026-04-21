@@ -96,6 +96,7 @@ If you prefer fully manual initialization for tightly controlled scenarios:
 	window.NotificationPush.initAll(document);
 </script>
 ```
+#### ℹ️ For details on the observer pattern and how to optimize automatic plugin initialization, see the section [Recommended Observer Pattern](../README.en.md#recommended-observer-pattern) in the main README.
 
 ## Note
 

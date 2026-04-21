@@ -97,6 +97,8 @@ Si prefieres inicializacion manual total para escenarios muy controlados:
 </script>
 ```
 
+#### ℹ️ Para detalles sobre el patrón de observers y cómo optimizar la inicialización automática de plugins, revisa la sección [Patrón Recomendado De Observers](../README.md#patron-recomendado-de-observers) en el README principal.
+
 ## Nota
 
 Este ejemplo esta pensado para aprendizaje y pruebas de integracion. Puedes copiar el patron y ajustarlo por modulo o por pantalla en tu proyecto real.
