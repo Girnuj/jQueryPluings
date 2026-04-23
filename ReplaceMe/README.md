@@ -1,16 +1,19 @@
 # ReplaceMe
 
-Plugin JavaScript nativo para reemplazar un elemento por HTML remoto al hacer clic.
+Plugin JavaScript nativo para reemplazar un elemento por HTML o JSON remoto al hacer clic.
 
 ## Que viene a solucionar
 
-Resuelve la carga parcial de HTML remoto sobre zonas concretas de la vista sin tener que montar un framework completo de rendering.
+Resuelve la carga parcial de HTML remoto sobre zonas concretas de la vista sin tener que montar un framework completo de rendering. Compatible con arquitecturas HTML over the wire y microservicios que devuelven fragmentos HTML o respuestas JSON con HTML embebido.
 
 ## Beneficios
 
 - Permite updates parciales de UI con bajo costo.
 - Evita recargas completas para cambios puntuales.
-- Simplifica integracion con endpoints que devuelven HTML.
+- Simplifica integracion con endpoints que devuelven HTML o JSON.
+- Soporta reemplazo de cualquier elemento del DOM, no solo el trigger.
+- Ciclo de vida completo con eventos cancelables.
+- Protección nativa contra doble click y peticiones concurrentes.
 - Reduce boilerplate para placeholders dinamicos.
 
 ## Requisitos
@@ -59,29 +62,77 @@ Con eso basta. El plugin se inicializa automaticamente al cargar el DOM.
 </button>
 ```
 
-## Como Funciona
+## Cómo Funciona
 
-- Busca elementos con `data-role="replace-me"`.
-- En click, hace una solicitud `GET` o `POST` (configurable) con `fetch` a `replaceSourceUrl`.
-- Si responde OK, reemplaza el trigger con el HTML recibido.
-- Si falla, deshabilita el trigger cuando aplica.
+1. Busca elementos con `data-role="replace-me"`.
+2. En click, emite `replace-me:before` (cancelable). Si se cancela, se detiene.
+3. Bloquea doble click mientras la petición está en curso.
+4. Hace una solicitud HTTP con `fetch` al endpoint configurado.
+5. Resuelve el nodo destino: `data-replace-me-target` o el propio trigger.
+6. En modo `html`: inyecta la respuesta directamente.
+7. En modo `json`: extrae el HTML de la clave configurada, o redirige si hay clave de redirect.
+8. Destruye la instancia antes de tocar el DOM (evita referencias huérfanas).
+9. Emite `replace-me:success` o `replace-me:error` según corresponda.
+10. Emite siempre `replace-me:after` al finalizar.
 
 ## Opciones
 
 - `replaceSourceUrl`: URL para solicitar el HTML remoto.
-- `requestMethod`: metodo HTTP (`GET` o `POST`). Por defecto: `POST`.
+- `requestMethod`: método HTTP (`GET`, `POST`, `PUT`, `PATCH`, `DELETE`). Por defecto: `POST`.
 
 Puedes configurarlo por atributo o por inicialización manual:
 
 - atributo: `data-replace-me-src="/ruta"`
 - atributo opcional: `data-replace-me-method="GET"`
-- opcion JS: `{ replaceSourceUrl: '/ruta', requestMethod: 'GET' }`
+- atributo opcional: `data-replace-me-mode="html"`
+- atributo opcional: `data-replace-me-target="#miElemento"`
+- opcion JS: `{ replaceSourceUrl: '/ruta', requestMethod: 'GET', responseMode: 'html', targetSelector: '#miElemento' }`
+
 
 ## Atributos `data-*` soportados
 
-- `data-role="replace-me"`: marca el trigger que sera reemplazado por HTML remoto en auto-init. Estado: **requerido en auto-inicializacion**.
+- `data-role="replace-me"`: marca el trigger que será reemplazado por HTML remoto en auto-init. Estado: **requerido**.
 - `data-replace-me-src`: URL origen desde donde se solicita el HTML. Estado: **requerido**.
-- `data-replace-me-method`: metodo HTTP de la solicitud (`GET` o `POST`). Estado: **opcional** (por defecto `POST`).
+- `data-replace-me-method`: método HTTP de la solicitud (`GET`, `POST`, `PUT`, `PATCH`, `DELETE`). Estado: **opcional** (por defecto `POST`).
+- `data-replace-me-mode`: modo de respuesta (`html` | `json`). Estado: **opcional** (por defecto `html`).
+- `data-replace-me-target`: Selector CSS del elemento a reemplazar. Estado: **opcional** (por defecto el trigger mismo).
+- `data-replace-me-json-html`: Clave del objeto JSON que contiene el HTML a inyectar. Estado: **opcional** (por defecto `"html"`).
+- `data-replace-me-json-redirect`: Clave del objeto JSON que indica una URL de redirección. Estado: **opcional** (por defecto `"redirect"`).
+
+## Eventos del ciclo de vida
+
+- `replace-me:before`: Disparado antes del fetch. Cancelable con evt.preventDefault(). detail: { trigger, target, options }
+- `replace-me:success`: Disparado tras reemplazo exitoso. detail: { trigger, target, html, raw } (raw = texto o JSON según el modo)
+- `replace-me:error`: Disparado si ocurre un error durante el reemplazo. detail: { trigger, target, error }
+- `replace-me:after`: Disparado siempre al terminar, sin importar el resultado. detail: { trigger, target }
+
+Puedes escuchar estos eventos para integrar lógica personalizada:
+
+```html
+<script>
+  // Cancelar una operación condicionalmente
+  document.addEventListener('replace-me:before', (e) => {
+    if (!confirm('¿Confirmas la acción?')) e.preventDefault();
+  });
+ 
+  // Reaccionar al éxito
+  document.addEventListener('replace-me:success', (e) => {
+    console.log('HTML inyectado:', e.detail.html);
+  });
+ 
+  // Manejar errores visualmente
+  document.addEventListener('replace-me:error', (e) => {
+    console.error('Falló:', e.detail.error.message);
+  });
+</script>
+```
+
+## Seguridad y microfrontends
+
+- El HTML remoto es sanitizado antes de inyectarse (usando el API nativo Sanitizer si está disponible).
+- Compatible con arquitecturas microfrontend: tras el reemplazo, todos los plugins se reinicializan automáticamente en el nuevo nodo.
+- Si el HTML remoto tiene un solo nodo raíz, se usa `replaceWith` para máxima seguridad y compatibilidad con Web Components.
+- Si hay más de un nodo raíz, se usa `outerHTML` (modo clásico, menos seguro pero compatible).
 
 ## Inicializacion Automatica
 
@@ -95,8 +146,8 @@ Ademas, usa `MutationObserver` para inicializar triggers agregados dinamicamente
 
 ```html
 <script>
-  ReplaceMe.init(document.querySelector('#miTrigger'));
-  ReplaceMe.initAll(document.querySelector('#miContenedor'));
+  window.Plugins.ReplaceMe.init(document.querySelector('#miTrigger'));
+  window.Plugins.ReplaceMe.initAll(document.querySelector('#miContenedor'));
 </script>
 ```
 
@@ -105,20 +156,20 @@ Ademas, usa `MutationObserver` para inicializar triggers agregados dinamicamente
 ```html
 <script>
   const trigger = document.querySelector('#miTrigger')
-      , instance = ReplaceMe.init(trigger);
+      , instance = window.Plugins.ReplaceMe.init(trigger);
 
-  ReplaceMe.getInstance(trigger);
-  ReplaceMe.destroy(trigger);
-  ReplaceMe.destroyAll(document.querySelector('#miContenedor'));
+  window.Plugins.ReplaceMe.getInstance(trigger);
+  window.Plugins.ReplaceMe.destroy(trigger);
+  window.Plugins.ReplaceMe.destroyAll(document.querySelector('#miContenedor'));
 
   instance.destroy();
 </script>
 ```
 
-- `ReplaceMe.init(element, options)`: crea o reutiliza una instancia.
-- `ReplaceMe.getInstance(element)`: devuelve la instancia actual o `null`.
-- `ReplaceMe.destroy(element)`: desmonta una instancia concreta.
-- `ReplaceMe.destroyAll(root)`: desmonta todas las instancias dentro de un contenedor.
+- `window.Plugins.ReplaceMe.init(element, options)`: crea o reutiliza una instancia.
+- `window.Plugins.ReplaceMe.getInstance(element)`: devuelve la instancia actual o `null`.
+- `window.Plugins.ReplaceMe.destroy(element)`: desmonta una instancia concreta.
+- `window.Plugins.ReplaceMe.destroyAll(root)`: desmonta todas las instancias dentro de un contenedor.
 - `instance.destroy()`: elimina listeners de la instancia actual.
 
 En uso normal no hace falta llamar `destroy()`: si el nodo se elimina del DOM, el plugin intenta desmontarlo automaticamente.
@@ -127,7 +178,10 @@ En uso normal no hace falta llamar `destroy()`: si el nodo se elimina del DOM, e
 
 - Falta `data-replace-me-src` y `replaceSourceUrl`: `init` lanza error.
 - Metodo HTTP invalido: `init` lanza error (solo `GET` o `POST`).
-- Endpoint responde error HTTP: el trigger queda deshabilitado (si aplica).
+- Endpoint responde error HTTP: se emite replace-me:error.
+- `data-replace-me-target` apunta a un selector que no existe: se emite replace-me:error.
+- Respuesta JSON sin la clave configurada en `data-replace-me-json-html`: se emite replace-me:error.
+- Respuesta JSON mal formada: se emite replace-me:error.
 
 ## Demo
 

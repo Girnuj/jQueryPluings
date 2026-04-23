@@ -27,6 +27,23 @@
 
   <section class="stack">
     <div class="panel">
+      <h2>Ejemplo avanzado: modo JSON, target y eventos</h2>
+      <!-- destruye nodo despues de reemplazar -->
+      <div id="card-container" class="remote-box">Zona a reemplazar por JSON</div>
+        <button
+          type="button"
+          data-role="replace-me"
+          data-replace-me-src="/demo/replace-json"
+          data-replace-me-mode="json"
+          data-replace-me-target="#card-container"
+          data-replace-me-json-html="content"
+          data-replace-me-json-redirect="nextUrl">
+          Actualizar tarjeta (JSON)
+        </button>
+    </div>
+
+
+    <div class="panel">
       <h2>Ejemplo con POST</h2>
       <button
         type="button"
@@ -52,7 +69,7 @@
     <div id="dynamicHost" class="panel"></div>
   </section>
  
-  <script src="./replaceMe.min.js"></script>
+  <script src="./replaceMe.js"></script>
   <script>
     // Simulador de endpoint para que el ejemplo funcione sin servidor.
     (function () {
@@ -65,10 +82,12 @@
 
         if (url === '/demo/replace-html' && (requestMethod === 'POST' || requestMethod === 'GET')) {
           const html =
-            '<div class="remote-box">' +
-              '<strong>Contenido remoto cargado</strong>' +
-              '<p>Este HTML fue devuelto por un fetch simulado usando <b>' + requestMethod + '</b>.</p>' +
-            '</div>';
+            '<section>' +
+              '<div class="remote-box">' +
+                '<strong>Contenido remoto cargado</strong>' +
+                '<p>Este HTML fue devuelto por un fetch simulado usando <b>' + requestMethod + '</b>.</p>' +
+              '</div>' +
+            '</section>';
 
           return new Response(html, {
             status: 200,
@@ -76,12 +95,39 @@
           });
         }
 
+        if (url === '/demo/replace-json' && requestMethod === 'POST') {
+          //en otro ejemplo de integracion se muestra la union de este plugin con templateRenderizer para ver datos JSON en HTML remoto.
+          const json = {
+            content: '<div class="remote-box"><b>Tarjeta actualizada vía JSON</b><br>HTML desde JSON simulado.</div>',
+            nextUrl: null // o pon una URL para probar redirección
+          };
+          return new Response(JSON.stringify(json), {
+            status: 200,
+            headers: { 'Content-Type': 'application/json; charset=utf-8' },
+          });
+        }
         return originalFetch(input, init);
       };
     })();
   </script>
 
   <script>
+    // Ejemplo de escucha de eventos del ciclo de vida
+    document.addEventListener('replace-me:success', (e) => {
+      console.log('Reemplazado:', e.detail);
+    });
+    document.addEventListener('replace-me:error', (e) => {
+      console.error('Falló:', e.detail.error);
+    });
+    document.addEventListener('replace-me:before', (e) => {
+      // Puedes cancelar el reemplazo con e.preventDefault();
+      // console.log('Antes de reemplazar', e.detail);
+    });
+    document.addEventListener('replace-me:after', (e) => {
+      // Siempre se dispara al final
+      // console.log('Después de reemplazar', e.detail);
+    });
+
     document.getElementById('addDynamic').addEventListener('click', function () {
       const host = document.getElementById('dynamicHost');
       host.insertAdjacentHTML(

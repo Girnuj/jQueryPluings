@@ -1,17 +1,20 @@
 # ReplaceMe
 
-Native JavaScript plugin to replace an element with remote HTML on click.
+Native JavaScript plugin to replace an element with remote HTML or JSON on click.
 
 ## Problem it solves
 
-Solves partial remote HTML updates for specific UI areas without requiring a full client-side rendering framework.
+It resolves the partial loading of remote HTML on specific areas of the view without requiring a complete rendering framework. Compatible with over-the-wire HTML architectures and microservices that return HTML fragments or JSON responses with embedded HTML.
 
 ## Benefits
 
-- Enables lightweight partial UI updates.
-- Avoids full reloads for localized changes.
-- Simplifies integration with HTML-returning endpoints.
-- Reduces boilerplate for dynamic placeholders.
+- Enables low-cost, partial UI updates.
+- Avoids full reloads for minor changes.
+- Simplifies integration with endpoints that return HTML or JSON.
+- Supports replacing any DOM element, not just the trigger.
+- Full lifecycle with cancelable events.
+- Native protection against double-clicks and concurrent requests.
+- Reduces boilerplate size for dynamic placeholders.
 
 ## Requirements
 
@@ -61,27 +64,77 @@ That is enough. The plugin initializes automatically when the DOM is ready.
 
 ## How It Works
 
-- Finds elements with `data-role="replace-me"`.
-- On click, sends a configurable `GET` or `POST` request with `fetch` to `replaceSourceUrl`.
-- If the response is OK, replaces the trigger with returned HTML.
-- If it fails, disables the trigger when possible.
+1. Finds elements with `data-role="replace-me"`.
+2. On click, emits `replace-me:before` (cancelable). If canceled, stops.
+3. Prevents double click while the request is in progress.
+4. Sends an HTTP request with `fetch` to the configured endpoint.
+5. Resolves the target node: `data-replace-me-target` or the trigger itself.
+6. In `html` mode: injects the response directly.
+7. In `json` mode: extracts HTML from the configured key, or redirects if a redirect key is present.
+8. Destroys the instance before touching the DOM (avoids orphaned references).
+9. Emits `replace-me:success` or `replace-me:error` as appropriate.
+10. Always emits `replace-me:after` at the end.
 
 ## Options
 
 - `replaceSourceUrl`: URL used to request remote HTML.
-- `requestMethod`: HTTP method (`GET` or `POST`). Default: `POST`.
+- `requestMethod`: HTTP method (`GET`, `POST`, `PUT`, `PATCH`, `DELETE`). Default: `POST`.
+- `responseMode`: Response mode (`html` or `json`). Default: `html`.
+- `targetSelector`: CSS selector for the element to replace. Default: the trigger itself.
+- `jsonHtmlKey`: Key in the JSON object containing the HTML to inject. Default: `html`.
+- `jsonRedirectKey`: Key in the JSON object indicating a redirect URL. Default: `redirect`.
 
 You can configure it by attribute or manual initialization:
 
 - attribute: `data-replace-me-src="/path"`
 - optional attribute: `data-replace-me-method="GET"`
-- JS option: `{ replaceSourceUrl: '/path', requestMethod: 'GET' }`
+- optional attribute: `data-replace-me-mode="html"`
+- optional attribute: `data-replace-me-target="#myElement"`
+- JS option: `{ replaceSourceUrl: '/path', requestMethod: 'GET', responseMode: 'html', targetSelector: '#myElement' }`
 
 ## Supported `data-*` attributes
 
-- `data-role="replace-me"`: marks the trigger that will be replaced by remote HTML in auto-init. Status: **required for auto-initialization**.
-- `data-replace-me-src`: source URL used to request remote HTML. Status: **required**.
-- `data-replace-me-method`: HTTP method for the request (`GET` or `POST`). Status: **optional** (default is `POST`).
+- `data-role="replace-me"`: marks the trigger to be replaced by remote HTML in auto-init. **Required**.
+- `data-replace-me-src`: source URL for the remote HTML. **Required**.
+- `data-replace-me-method`: HTTP method (`GET`, `POST`, `PUT`, `PATCH`, `DELETE`). Optional (default: `POST`).
+- `data-replace-me-mode`: response mode (`html` | `json`). Optional (default: `html`).
+- `data-replace-me-target`: CSS selector for the element to replace. Optional (default: the trigger itself).
+- `data-replace-me-json-html`: Key in the JSON object containing the HTML to inject. Optional (default: `html`).
+- `data-replace-me-json-redirect`: Key in the JSON object indicating a redirect URL. Optional (default: `redirect`).
+## Lifecycle Events
+
+- `replace-me:before`: Fired before fetch. Cancelable with evt.preventDefault(). detail: { trigger, target, options }
+- `replace-me:success`: Fired after successful replacement. detail: { trigger, target, html, raw } (raw = text or JSON depending on mode)
+- `replace-me:error`: Fired if an error occurs during replacement. detail: { trigger, target, error }
+- `replace-me:after`: Always fired at the end, regardless of result. detail: { trigger, target }
+
+You can listen to these events to integrate custom logic:
+
+```html
+<script>
+  // Conditionally cancel an operation
+  document.addEventListener('replace-me:before', (e) => {
+    if (!confirm('Do you confirm this action?')) e.preventDefault();
+  });
+ 
+  // React to success
+  document.addEventListener('replace-me:success', (e) => {
+    console.log('Injected HTML:', e.detail.html);
+  });
+ 
+  // Handle errors visually
+  document.addEventListener('replace-me:error', (e) => {
+    console.error('Failed:', e.detail.error.message);
+  });
+</script>
+```
+
+## Security and Microfrontends
+
+- Remote HTML is sanitized before injection (using the native Sanitizer API if available).
+- Compatible with microfrontend architectures: after replacement, all plugins are automatically re-initialized on the new node.
+- If the remote HTML has a single root node, `replaceWith` is used for maximum security and Web Components compatibility.
+- If there is more than one root node, `outerHTML` is used (classic mode, less secure but compatible).
 
 ## Automatic Initialization
 
@@ -95,8 +148,8 @@ It also uses `MutationObserver` to initialize triggers added dynamically to the 
 
 ```html
 <script>
-  ReplaceMe.init(document.querySelector('#myTrigger'));
-  ReplaceMe.initAll(document.querySelector('#myContainer'));
+  window.Plugins.ReplaceMe.init(document.querySelector('#myTrigger'));
+  window.Plugins.ReplaceMe.initAll(document.querySelector('#myContainer'));
 </script>
 ```
 
@@ -105,20 +158,20 @@ It also uses `MutationObserver` to initialize triggers added dynamically to the 
 ```html
 <script>
   const trigger = document.querySelector('#myTrigger')
-      , instance = ReplaceMe.init(trigger);
+      , instance = window.Plugins.ReplaceMe.init(trigger);
 
-  ReplaceMe.getInstance(trigger);
-  ReplaceMe.destroy(trigger);
-  ReplaceMe.destroyAll(document.querySelector('#myContainer'));
+  window.Plugins.ReplaceMe.getInstance(trigger);
+  window.Plugins.ReplaceMe.destroy(trigger);
+  window.Plugins.ReplaceMe.destroyAll(document.querySelector('#myContainer'));
 
   instance.destroy();
 </script>
 ```
 
-- `ReplaceMe.init(element, options)`: creates or reuses an instance.
-- `ReplaceMe.getInstance(element)`: returns the current instance or `null`.
-- `ReplaceMe.destroy(element)`: tears down a specific instance.
-- `ReplaceMe.destroyAll(root)`: tears down all instances inside a container.
+- `window.Plugins.ReplaceMe.init(element, options)`: creates or reuses an instance.
+- `window.Plugins.ReplaceMe.getInstance(element)`: returns the current instance or `null`.
+- `window.Plugins.ReplaceMe.destroy(element)`: tears down a specific instance.
+- `window.Plugins.ReplaceMe.destroyAll(root)`: tears down all instances inside a container.
 - `instance.destroy()`: removes listeners for the current instance.
 
 In normal usage you do not need to call `destroy()`: if the node is removed from the DOM, the plugin attempts to tear it down automatically.
@@ -126,7 +179,7 @@ In normal usage you do not need to call `destroy()`: if the node is removed from
 ## Common Errors
 
 - Missing both `data-replace-me-src` and `replaceSourceUrl`: `init` throws.
-- Invalid HTTP method: `init` throws (only `GET` or `POST`).
+- Invalid HTTP method: `init` throws (only `GET`, `POST`, `PUT`, `PATCH`, `DELETE`).
 - Endpoint returns HTTP error: trigger is disabled (when possible).
 
 ## Demo
