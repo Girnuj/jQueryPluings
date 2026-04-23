@@ -10,14 +10,10 @@
 (function () {
     'use strict';
 
-    /**
-     * Selector declarativo de hosts administrados por UIState.
-     * @type {string}
-     */
+    // ─── Constantes ──────────────────────────────────────────────────────────────
+
     const SELECTOR_SUBJECT = '[data-ui-state-host]'
-        /** @type {string} */
         , SELECTOR_TRIGGER = '[data-ui-state-trigger]'
-        /** @type {string} */
         , STATE_ATTRIBUTE = 'data-ui-state-current'
         /**
          * Registro de instancias por host.
@@ -45,6 +41,8 @@
         afterChange: function () { },
         afterRestore: function () { },
     });
+
+    // ─── Helpers ────────────────────────────────────────────────────
 
     /**
      * Parsea lista CSV en arreglo de tokens no vacios.
@@ -90,29 +88,6 @@
         }
 
         return subjects;
-    };
-
-    /**
-     * Limpia instancias asociadas a nodos removidos del DOM.
-     * @returns {void}
-     */
-    const flushPendingRemovals = () => {
-        PENDING_REMOVALS.forEach((node) => {
-            if (!node.isConnected) {
-                UIState.destroyAll(node);
-            }
-            PENDING_REMOVALS.delete(node);
-        });
-    };
-
-    /**
-     * Agenda chequeo diferido para destruccion segura de instancias.
-     * @param {Element} node Nodo removido en mutacion.
-     * @returns {void}
-     */
-    const scheduleRemovalCheck = (node) => {
-        PENDING_REMOVALS.add(node);
-        queueMicrotask(flushPendingRemovals);
     };
 
     /**
@@ -176,6 +151,8 @@
         return options;
     };
 
+    // ─── Typedef ──────────────────────────────────────────────────────────────────
+
     /**
      * Opciones publicas de UIState.
      * @typedef {Object} UIStateOptions
@@ -189,6 +166,8 @@
      * @property {(detail:Object)=>void} [afterChange] Hook posterior al cambio.
      * @property {(detail:Object)=>void} [afterRestore] Hook posterior a restauracion.
      */
+
+    // ─── Clase principal ──────────────────────────────────────────────────────────
 
     /**
      * Controlador de estados visuales para un componente de UI.
@@ -409,9 +388,7 @@
 
         /**
          * Restaura HTML y estado base del componente.
-         *
          * Tambien limpia clases de estado y re-habilita interaccion interna.
-         *
          * @returns {void}
          */
         restore() {
@@ -445,6 +422,8 @@
             this.restore();
             INSTANCES.delete(this.subject);
         }
+
+        // ── API estática ────────────────────────────────────────────────────────
 
         /**
          * Inicializa o reutiliza una instancia de UIState para un host.
@@ -514,8 +493,7 @@
 
     /**
      * Delega cambios de estado declarativos desde triggers `data-ui-state-trigger`.
-     *
-     * @param {MouseEvent} evt Evento click delegado en documento.
+     * @param {MouseEvent} evt Evento click delegado.
      * @returns {void}
      */
     const onTriggerClick = (evt) => {
@@ -547,54 +525,127 @@
 
         instance.setState(nextState, payload);
     };
+ 
+	// ─── ObserverDispatcher ───────────────────────────────────────────────────────
 
     /**
-     * Inicializa el plugin automaticamente y activa observacion de cambios en el DOM.
-     *
-     * @returns {void}
+     * ObserverDispatcher avanzado: permite a cada plugin observar solo el root que le corresponde,
+     * evitando múltiples MutationObserver redundantes y respetando la configuración global.
      */
-    const startAutoInit = () => {
-        UIState.initAll(document);
+    if (!window.Plugins) window.Plugins = {};
+    if (!window.Plugins.ObserverDispatcher) {
+        window.Plugins.ObserverDispatcher = (function() {
+            // Mapa: rootElement => { observer, handlers[] }
+            const roots = new WeakMap();
 
-        document.addEventListener('click', onTriggerClick);
+            /**
+             * Obtiene el root adecuado para un plugin según la prioridad documentada.
+             * @param {string} pluginKey Ej: 'form-request'
+             * @returns {Element}
+             */
+            function resolveRoot(pluginKey) {
+                // 1. data-pp-observe-root-{plugin}
+                const attr = 'data-pp-observe-root-' + pluginKey
+                    , specific = document.querySelector('[' + attr + ']');
+                if (specific) return specific;
 
-        const observer = new MutationObserver((mutations) => {
-            mutations.forEach((mutation) => {
-                mutation.addedNodes.forEach((node) => {
-                    if (node.nodeType !== 1) return;
-                    PENDING_REMOVALS.delete(node);
-                    UIState.initAll(node);
-                });
-
-                mutation.removedNodes.forEach((node) => {
-                    if (node.nodeType !== 1) return;
-                    scheduleRemovalCheck(node);
-                });
-            });
-        });
-
-        const observeGlobal = (document.documentElement.getAttribute('data-pp-observe-global') || '').trim().toLowerCase();
-        if (!['false', '0', 'off', 'no'].includes(observeGlobal)) {
-            const observeRootSelector = (document.documentElement.getAttribute('data-pp-observe-root') || '').trim();
-            const observeRootElement = document.querySelector('[data-pp-observe-root-ui-state]');
-            let observeRoot = observeRootElement || document.body || document.documentElement;
-
-            if (observeRootSelector && !observeRootElement) {
-                try {
-                    observeRoot = document.querySelector(observeRootSelector) || observeRoot;
-                } catch (_error) {
-                    observeRoot = document.body || document.documentElement;
+                // 2. data-pp-observe-root en <html>
+                const html = document.documentElement
+                    , selector = html.getAttribute('data-pp-observe-root');
+                if (selector) {
+                    try {
+                        const el = document.querySelector(selector);
+                        if (el) return el;
+                    } catch (_) {}
                 }
+
+                // 3. Fallback seguro
+                return document.body || html;
             }
 
-            observer.observe(observeRoot, { childList: true, subtree: true });
-        }
+            /**
+             * Registra un handler para un plugin sobre el root adecuado.
+             * @param {string} pluginKey
+             * @param {function} handler
+             */
+            function register(pluginKey, handler) {
+                const html = document.documentElement
+                    , observeGlobal = (html.getAttribute('data-pp-observe-global') || '').trim().toLowerCase();
+                if (["false", "0", "off", "no"].includes(observeGlobal)) return; // Observación global desactivada
+
+                const root = resolveRoot(pluginKey);
+                let entry = roots.get(root);
+                if (!entry) {
+                    entry = { handlers: [], observer: null };
+                    entry.observer = new MutationObserver((mutations) => {
+                        entry.handlers.forEach(fn => {
+                            try { fn(mutations); } catch (e) {}
+                        });
+                    });
+                    entry.observer.observe(root, { childList: true, subtree: true });
+                    roots.set(root, entry);
+                }
+                entry.handlers.push(handler);
+            }
+
+            return { register, resolveRoot };
+        })();
+    }
+
+    // ─── Gestión de remociones diferidas ─────────────────────────────────────────
+
+    /**
+     * Limpia instancias cuyos nodos fueron removidos del DOM.
+     * @returns {void}
+     */
+    const flushPendingRemovals = () => {
+        PENDING_REMOVALS.forEach((node) => {
+            if (!node.isConnected) {
+                UIState.destroyAll(node);
+            }
+            PENDING_REMOVALS.delete(node);
+        });
+    };
+
+    /**
+     * Agenda chequeo diferido para evitar destroy en reubicaciones temporales.
+     * @param {Element} node Nodo removido en mutacion.
+     * @returns {void}
+     */
+    const scheduleRemovalCheck = (node) => {
+        PENDING_REMOVALS.add(node);
+        queueMicrotask(flushPendingRemovals);
+    };
+
+    // ─── Handler de mutaciones DOM ────────────────────────────────────────────────
+
+    const uiStateDomHandler = (mutations) => {
+        mutations.forEach((mutation) => {
+            mutation.addedNodes.forEach((node) => {
+                if (node.nodeType !== 1) return;
+                PENDING_REMOVALS.delete(node);
+                UIState.initAll(node);
+            });
+            mutation.removedNodes.forEach((node) => {
+                if (node.nodeType !== 1) return;
+                scheduleRemovalCheck(node);
+            });
+        });
+    };
+
+	// ─── Auto-init ────────────────────────────────────────────────────────────────
+
+    const startAutoInit = () => {
+        const root = window.Plugins.ObserverDispatcher.resolveRoot('ui-state');  
+        UIState.initAll(root);
+        root.addEventListener('click', onTriggerClick);
+        // Usar ObserverDispatcher para registrar el handler solo sobre el root adecuado
+        window.Plugins.ObserverDispatcher.register('ui-state', uiStateDomHandler);
     };
 
     document.readyState === 'loading'
         ? document.addEventListener('DOMContentLoaded', startAutoInit, { once: true })
         : startAutoInit();
 
-    window.Plugins = window.Plugins || {};
     window.Plugins.UIState = UIState;
 })();
