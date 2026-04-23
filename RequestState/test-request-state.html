@@ -104,10 +104,11 @@
                     class="action"
                     data-form-validate
                     data-form-request
+                    data-request-state
+                    data-rs-target="#integratedState"
                     data-form-response="json"
                     action="https://jsonplaceholder.typicode.com/posts"
                     method="POST"
-                    data-form-method="POST"
                     data-form-same-origin="false"
                     data-form-timeout="9000"
                     data-form-retry-count="1"
@@ -119,7 +120,13 @@
 
                     <label>
                         Nombre
-                        <input type="text" name="name" required />
+                        <input 
+                            type="text" 
+                            name="name" 
+                            required  
+                            data-fv-no-whitespace="true"
+                            data-fv-message-no-whitespace="El usuario no puede tener espacios." 
+                        />
                     </label>
 
                     <label>
@@ -131,8 +138,6 @@
                         id="integratedSubmit"
                         type="submit"
                         class="btn"
-                        data-request-state
-                        data-rs-target="#integratedState"
                         data-rs-message-target="#integratedMessage"
                         data-rs-loading-text="Enviando formulario..."
                         data-rs-success-text="Enviado correctamente"
@@ -304,9 +309,9 @@
         </aside>
     </main>
 
-    <script src="../FormValidate/formValidate.min.js"></script>
-    <script src="../FormRequest/formRequest.min.js"></script>
-    <script src="./requestState.min.js"></script>
+    <script src="../FormValidate/formValidate.js"></script>
+    <script src="../FormRequest/formRequest.js"></script>
+    <script src="./requestState.js"></script>
     <script>
         (function () {
             const logs = document.querySelector('#logs')

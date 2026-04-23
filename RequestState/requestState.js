@@ -1,7 +1,7 @@
 ﻿/**
  * @fileoverview Plugin nativo para gestionar estados de request (idle/loading/success/error) por data-*.
  * @module RequestState
- * @version 1.0
+ * @version 2.0
  * @since 2026
  * @author Samuel Montenegro
  * @license MIT
@@ -9,6 +9,8 @@
  */
 (function () {
     'use strict';
+
+    // ─── Constantes ──────────────────────────────────────────────────────────────
 
     /**
      * Selector declarativo de triggers que usan RequestState.
@@ -69,6 +71,8 @@
         onError: function () { },
         onComplete: function () { },
     });
+
+    // ─── Helpers────────────────────────────────────────────────────
 
     /**
      * Normaliza valores declarativos a booleanos.
@@ -239,29 +243,6 @@
     };
 
     /**
-     * Limpia instancias de nodos removidos del DOM.
-     * @returns {void}
-     */
-    const flushPendingRemovals = () => {
-        PENDING_REMOVALS.forEach((node) => {
-            if (!node.isConnected) {
-                RequestState.destroyAll(node);
-            }
-            PENDING_REMOVALS.delete(node);
-        });
-    };
-
-    /**
-     * Agenda chequeo diferido para destruccion segura de instancias.
-     * @param {Element} node Nodo removido por mutacion.
-     * @returns {void}
-     */
-    const scheduleRemovalCheck = (node) => {
-        PENDING_REMOVALS.add(node);
-        queueMicrotask(flushPendingRemovals);
-    };
-
-    /**
      * Construye payload dinamico leyendo atributos `data-rs-name-*` del trigger.
      *
      * @param {HTMLElement} element Elemento sujeto del plugin.
@@ -335,6 +316,8 @@
         return options;
     };
 
+    // ─── Typedef ──────────────────────────────────────────────────────────────────
+
     /**
      * Opciones publicas para configurar estados visuales, retry y request remoto.
      * @typedef {Object} RequestStateOptions
@@ -366,6 +349,8 @@
      * @property {(ctx:Object)=>void} [onError] Hook en error.
      * @property {(ctx:Object)=>void} [onComplete] Hook final del ciclo.
      */
+
+    // ─── Clase principal ──────────────────────────────────────────────────────────
 
     /**
      * Plugin para manejar estados visuales de acciones async en botones, enlaces o formularios.
@@ -633,42 +618,43 @@
          * @returns {void}
          */
         setState(nextState, context) {
-            const target = this.targetElement
-                , classMap = {
-                    idle: this.options.idleClass,
-                    loading: this.options.loadingClass,
-                    success: this.options.successClass,
-                    error: this.options.errorClass,
-                }
-                , messageMap = {
-                    loading: this.subject.dataset.rsLoadingText || this.options.loadingText,
-                    success: this.subject.dataset.rsSuccessText || this.options.successText,
-                    error: this.subject.dataset.rsErrorText || this.options.errorText,
-                    idle: '',
-                };
-
+            const target = this.targetElement;
+            // Buscar el botón submit si el trigger es un form
+            let submitBtn = null;
+            if (this.isFormSubject) {
+                submitBtn = this.subject.querySelector('button[type="submit"], input[type="submit"], button:not([type])');
+            }
+            // Para cada estado, prioriza el texto del botón submit si existe, luego el form, luego defaults
+            const messageMap = {
+                loading: (submitBtn && submitBtn.dataset.rsLoadingText) ? submitBtn.dataset.rsLoadingText : (this.subject.dataset.rsLoadingText || this.options.loadingText),
+                success: (submitBtn && submitBtn.dataset.rsSuccessText) ? submitBtn.dataset.rsSuccessText : (this.subject.dataset.rsSuccessText || this.options.successText),
+                error: (submitBtn && submitBtn.dataset.rsErrorText) ? submitBtn.dataset.rsErrorText : (this.subject.dataset.rsErrorText || this.options.errorText),
+                idle: '',
+            };
+            const classMap = {
+                idle: this.options.idleClass,
+                loading: this.options.loadingClass,
+                success: this.options.successClass,
+                error: this.options.errorClass,
+            };
             [this.subject, target].forEach((node) => {
                 if (!(node instanceof HTMLElement)) return;
                 Object.values(classMap).forEach((className) => {
                     if (className) node.classList.remove(className);
                 });
-
                 const nextClass = classMap[nextState];
                 if (nextClass) node.classList.add(nextClass);
                 node.setAttribute('data-rs-state', nextState);
                 node.setAttribute('aria-busy', String(nextState === STATE_LOADING));
             });
-
             const messageNode = this.getMessageElement(target);
             if (messageNode) {
                 messageNode.textContent = messageMap[nextState] || '';
             }
-
             if (this.options.disableOnLoading) {
                 const shouldDisable = nextState !== STATE_IDLE;
                 this.setInteractiveDisabled(shouldDisable);
             }
-
             this.state = nextState;
             this.options.onStateChange && this.options.onStateChange(nextState, context);
             this.subject.dispatchEvent(new CustomEvent('state.plugin.requestState', {
@@ -952,6 +938,8 @@
             INSTANCES.delete(this.subject);
         }
 
+        // ── API estática ────────────────────────────────────────────────────────
+        
         /**
          * Inicializa o reutiliza instancia para un trigger.
          * @param {HTMLElement} element Trigger objetivo.
@@ -1015,48 +1003,127 @@
         }
     }
 
-    window.Plugins = window.Plugins || {};
-    window.Plugins.RequestState = RequestState;
+	// ─── ObserverDispatcher ───────────────────────────────────────────────────────
 
-    const bootstrap = () => {
-        RequestState.initAll(document);
+    /**
+     * ObserverDispatcher avanzado: permite a cada plugin observar solo el root que le corresponde,
+     * evitando múltiples MutationObserver redundantes y respetando la configuración global.
+     */
+    if (!window.Plugins) window.Plugins = {};
+    if (!window.Plugins.ObserverDispatcher) {
+        window.Plugins.ObserverDispatcher = (function() {
+            // Mapa: rootElement => { observer, handlers[] }
+            const roots = new WeakMap();
+
+            /**
+             * Obtiene el root adecuado para un plugin según la prioridad documentada.
+             * @param {string} pluginKey Ej: 'form-validate'
+             * @returns {Element}
+             */
+            function resolveRoot(pluginKey) {
+                // 1. data-pp-observe-root-{plugin}
+                const attr = 'data-pp-observe-root-' + pluginKey
+                    , specific = document.querySelector(`[${attr}]`);
+                if (specific) return specific;
+
+                // 2. data-pp-observe-root en <html>
+                const html = document.documentElement
+                    , selector = html.getAttribute('data-pp-observe-root');
+                if (selector) {
+                    try {
+                        const el = document.querySelector(selector);
+                        if (el) return el;
+                    } catch (_) {}
+                }
+
+                // 3. Fallback seguro
+                return document.body || html;
+            }
+
+            /**
+             * Registra un handler para un plugin sobre el root adecuado.
+             * @param {string} pluginKey
+             * @param {function} handler
+             */
+            function register(pluginKey, handler) {
+                const html = document.documentElement
+                    , observeGlobal = (html.getAttribute('data-pp-observe-global') || '').trim().toLowerCase();
+                if (["false", "0", "off", "no"].includes(observeGlobal)) return; // Observación global desactivada
+
+                const root = resolveRoot(pluginKey);
+                let entry = roots.get(root);
+                if (!entry) {
+                    entry = { handlers: [], observer: null };
+                    entry.observer = new MutationObserver((mutations) => {
+                        entry.handlers.forEach(fn => {
+                            try { fn(mutations); } catch (e) {}
+                        });
+                    });
+                    entry.observer.observe(root, { childList: true, subtree: true });
+                    roots.set(root, entry);
+                }
+                entry.handlers.push(handler);
+            }
+
+            return { register };
+        })();
+    }
+
+    // ─── Gestión de remociones diferidas ─────────────────────────────────────────
+
+    /**
+     * Limpia instancias asociadas a nodos removidos del DOM.
+     * @returns {void}
+     */
+    const flushPendingRemovals = () => {
+        PENDING_REMOVALS.forEach((node) => {
+            if (!node.isConnected) {
+                RequestState.destroyAll(node);
+            }
+            PENDING_REMOVALS.delete(node);
+        });
     };
 
-    document.readyState === 'loading'
-        ? document.addEventListener('DOMContentLoaded', bootstrap, { once: true })
-        : bootstrap();
+    /**
+     * Agenda chequeo diferido para destruccion segura.
+     * @param {Element} node Nodo removido por mutacion.
+     * @returns {void}
+     */
+    const scheduleRemovalCheck = (node) => {
+        PENDING_REMOVALS.add(node);
+        queueMicrotask(flushPendingRemovals);
+    };
 
-    const observer = new MutationObserver((mutations) => {
+    // ─── Handler de mutaciones DOM ────────────────────────────────────────────────
+    /**
+     * Inicializa automaticamente las instancias del plugin y observa cambios en el DOM.
+     * @returns {void}
+     */
+    const requestStateDomHandler = (mutations) => {
         mutations.forEach((mutation) => {
             mutation.addedNodes.forEach((node) => {
                 if (!(node instanceof Element)) return;
+                PENDING_REMOVALS.delete(node);
                 RequestState.initAll(node);
             });
-
             mutation.removedNodes.forEach((node) => {
                 if (!(node instanceof Element)) return;
                 scheduleRemovalCheck(node);
             });
         });
-    });
+    };
 
-    const observeGlobal = (document.documentElement.getAttribute('data-pp-observe-global') || '').trim().toLowerCase();
-    if (!['false', '0', 'off', 'no'].includes(observeGlobal)) {
-        const observeRootSelector = (document.documentElement.getAttribute('data-pp-observe-root') || '').trim();
-        const observeRootElement = document.querySelector('[data-pp-observe-root-request-state]');
-        let observeRoot = observeRootElement || document.body || document.documentElement;
+	// ─── Auto-init ────────────────────────────────────────────────────────────────
 
-        if (observeRootSelector && !observeRootElement) {
-            try {
-                observeRoot = document.querySelector(observeRootSelector) || observeRoot;
-            } catch (_error) {
-                observeRoot = document.body || document.documentElement;
-            }
-        }
-
-        observer.observe(observeRoot, {
-            childList: true,
-            subtree: true
-        });
-    }
+    const bootstrap = () => {
+        RequestState.initAll(document);
+        // Usar ObserverDispatcher para registrar el handler solo sobre el root adecuado
+        window.Plugins.ObserverDispatcher.register('request-state', requestStateDomHandler);
+    };
+    
+    document.readyState === 'loading'
+    ? document.addEventListener('DOMContentLoaded', bootstrap, { once: true })
+    : bootstrap();
+    
+    window.Plugins.RequestState = RequestState;
 })();

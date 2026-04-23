@@ -1166,6 +1166,7 @@
 
             if (!isValid) {
                 evt.preventDefault();
+                evt.stopPropagation();
             }
         }
 

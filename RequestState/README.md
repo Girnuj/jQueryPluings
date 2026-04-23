@@ -97,12 +97,16 @@ Si `data-request-state` se define sobre un `<form>`, el plugin intercepta `submi
   data-rs-send="true"
   data-rs-endpoint="/api/profile"
   data-rs-method="POST"
-  data-rs-loading-text="Guardando..."
-  data-rs-success-text="Perfil actualizado"
-  data-rs-error-text="No se pudo guardar"
 >
   <input type="text" name="name" value="Samuel" />
-  <button type="submit">Guardar</button>
+  <button 
+    type="submit"
+    data-rs-loading-text="Guardando..."
+    data-rs-success-text="Perfil actualizado"
+    data-rs-error-text="No se pudo guardar"
+  >
+    Guardar
+  </button>
 </form>
 ```
 

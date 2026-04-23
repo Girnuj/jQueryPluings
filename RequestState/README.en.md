@@ -97,12 +97,16 @@ When `data-request-state` is placed on a `<form>`, plugin intercepts `submit` au
   data-rs-send="true"
   data-rs-endpoint="/api/profile"
   data-rs-method="POST"
-  data-rs-loading-text="Saving..."
-  data-rs-success-text="Profile updated"
-  data-rs-error-text="Could not save"
 >
   <input type="text" name="name" value="Samuel" />
-  <button type="submit">Save</button>
+  <button 
+    type="submit"
+    data-rs-loading-text="Saving..."
+    data-rs-success-text="Profile updated"
+    data-rs-error-text="Could not save"
+  >
+    Save
+  </button>
 </form>
 ```
 

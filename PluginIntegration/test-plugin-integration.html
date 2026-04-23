@@ -191,6 +191,8 @@
         data-form-response="json"
         action="/api/profile"
         method="post"
+        data-request-state
+        data-rs-target="#simpleState"
       >
         <input type="hidden" id="simpleRequiredFlag" value="on" />
 
@@ -244,11 +246,9 @@
 
         <div class="row">
           <button
-            id="simpleSubmit"
             type="submit"
+            id="simpleSubmit"
             class="btn-secondary"
-            data-request-state
-            data-rs-target="#simpleState"
             data-rs-message-target="#simpleMessage"
             data-rs-loading-text="Procesando formulario..."
             data-rs-success-text="Formulario enviado"
@@ -359,11 +359,11 @@
     </section>
   </div>
 
-  <script src="../Modal/modal.min.js"></script>
-  <script src="../FormValidate/formValidate.min.js"></script>
-  <script src="../ConfirmAction/confirmAction.min.js"></script>
-  <script src="../FormRequest/formRequest.min.js"></script>
-  <script src="../RequestState/requestState.min.js"></script>
+  <script src="../Modal/modal.js"></script>
+  <script src="../FormValidate/formValidate.js"></script>
+  <script src="../ConfirmAction/confirmAction.js"></script>
+  <script src="../FormRequest/formRequest.js"></script>
+  <script src="../RequestState/requestState.js"></script>
   <script src="../NotificationPush/notificationPush.min.js"></script>
 
   <script>
@@ -463,6 +463,20 @@
 
         syncStateField(simpleSubmit, 'simpleState', 'state.plugin.requestState(simple) -> ');
 
+        // Log de eventos de ciclo para simpleForm
+        simpleForm.addEventListener('before.plugin.formRequest', function () {
+          addLog('before.plugin.formRequest(simple)');
+        });
+        simpleForm.addEventListener('success.plugin.formRequest', function (evt) {
+          addLog('success.plugin.formRequest(simple)');
+        });
+        simpleForm.addEventListener('error.plugin.formRequest', function (evt) {
+          addLog('error.plugin.formRequest(simple)');
+        });
+        simpleForm.addEventListener('complete.plugin.formRequest', function () {
+          addLog('complete.plugin.formRequest(simple)');
+        });
+
         if (simpleRs) {
           // Puente de eventos para usar RequestState solo como capa visual del submit real.
           const baseContext = {
@@ -472,12 +486,10 @@
           };
 
           simpleForm.addEventListener('before.plugin.formRequest', function () {
-            addLog('before.plugin.formRequest(simple)');
             simpleRs.setState('loading', baseContext);
           });
 
           simpleForm.addEventListener('success.plugin.formRequest', function (evt) {
-            addLog('success.plugin.formRequest(simple)');
             simpleRs.setState('success', {
               ...baseContext,
               response: evt && evt.detail ? evt.detail.response : null
@@ -485,7 +497,6 @@
           });
 
           simpleForm.addEventListener('error.plugin.formRequest', function (evt) {
-            addLog('error.plugin.formRequest(simple)');
             simpleRs.setState('error', {
               ...baseContext,
               error: evt && evt.detail ? evt.detail.error : null
@@ -493,7 +504,6 @@
           });
 
           simpleForm.addEventListener('complete.plugin.formRequest', function () {
-            addLog('complete.plugin.formRequest(simple)');
             window.setTimeout(function () {
               simpleRs.setState('idle', baseContext);
             }, 1300);
